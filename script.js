@@ -1132,5 +1132,5 @@ function modifierNomResponsable() {
         rafraichir();
     }
 }
-changerDonneesCloud();
+chargerDonneesCloud();
 verifierConnexionExistante();
