@@ -8,11 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
         <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = "https://iaaphyeubiebpqzvrmys.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_Lbs8UX-xZ2nBqLnXSx-m3Q_iJovAW9L";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.SUPABASE_URL = "https://iaaphyeubiebpqzvrmys.supabase.co";
+        window.SUPABASE_ANON_KEY = "sb_publishable_Lbs8UX-xZ2nBqLnXSx-m3Q_iJovAW9L";
+        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
         console.log("✅ Supabase connecté");
     </script>
 </head>
