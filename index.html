@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMAO - Hôpital Sakété-Ifangni</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- PAGE ACCUEIL (VERT) -->
+<div id="pageAccueil" style="display: block;">
+    <div class="header-vert">
+        <div class="header-logo">
+            <div class="logo-placeholder">🏥</div>
+            <div class="header-text">
+                <h1>Hôpital de Zone Sakété-Ifangni</h1>
+                <p>⚰️ GMAO - Chambre froide mortuaire | ☀️ Énergie solaire</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="bandeau-info">
+            <marquee behavior="scroll" direction="left">🟢 Bienvenue sur la plateforme GMAO - Optimisation énergétique et maintenance via GMAO de la chambre froide mortuaire de l'Hôpital de Zone de Sakété-Ifangni : une approche solaire </marquee>
+        </div>
+
+        <div class="stats-rapides">
+            <div class="stat-rapide"><div class="stat-rapide-icon">🌡️</div><div class="stat-rapide-info"><div class="stat-rapide-valeur" id="derniereTemp">-- °C</div><div class="stat-rapide-label">Dernière température</div></div></div>
+            <div class="stat-rapide"><div class="stat-rapide-icon">☀️</div><div class="stat-rapide-info"><div class="stat-rapide-valeur" id="etatSolaireActuel">--</div><div class="stat-rapide-label">État du système solaire</div></div></div>
+            <div class="stat-rapide"><div class="stat-rapide-icon">📅</div><div class="stat-rapide-info"><div class="stat-rapide-valeur" id="derniereMaintenance">--</div><div class="stat-rapide-label">Dernière maintenance</div></div></div>
+            <div class="stat-rapide"><div class="stat-rapide-icon">⚠️</div><div class="stat-rapide-info"><div class="stat-rapide-valeur" id="prochaineMaintenance">--</div><div class="stat-rapide-label">Prochaine maintenance</div></div></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card"><h2>📍 Localisation</h2><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.5!2d2.658!3d6.736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1023e0a2e5a0e0a1%3A0x0!2zU2FrZXTDqSwgQsOpbmlu!5e0!3m2!1sfr!2s!4v1" width="100%" height="250" style="border:0;" allowfullscreen loading="lazy"></iframe><p><strong>📍 Adresse :</strong> Sakété-Ifangni, Bénin</p><p><strong>📞 Standard :</strong> +229 21 33 21 78 / 21 33 21 63</p><p><strong>📧 Email :</strong> infos@sante.gouv.bj</p></div>
+            <div class="card"><h2>🔗 Contacts d'urgence</h2><div class="urgence-contact"><div class="contact-item"><span>🚨 Personne d'urgence :</span><strong>+229 01 91 47 32 41</strong></div><div class="contact-item"><span>🔧 Technicien maintenance :</span><strong>+229 01 66 55 55 69</strong></div></div><hr><div class="liens"><a href="#" class="lien">📖 Notice technique</a><a href="#" class="lien">🎓 Tutoriels</a><a href="#" class="lien">❓ FAQ</a></div></div>
+        </div>
+
+        <div class="card"><h2>🖼️ Galerie</h2><div class="galerie"><div class="galerie-item"><div class="galerie-placeholder">🏥</div><p>Hôpital</p></div><div class="galerie-item"><div class="galerie-placeholder">❄️</div><p>Chambre froide</p></div><div class="galerie-item"><div class="galerie-placeholder">☀️</div><p>Panneaux solaires</p></div><div class="galerie-item"><div class="galerie-placeholder">🔧</div><p>Équipements</p></div></div></div>
+
+        <div class="card-connexion"><div class="connexion-buttons"><button onclick="afficherPageConnexion()" class="btn-vert">🔐 Espace Responsable</button><button onclick="afficherPageConnexionTechnicien()" class="btn-violet">🔧 Espace Technicien</button></div><p class="info-connexion">Accès sécurisé - Identifiants fournis par l'administration</p></div>
+    </div>
+</div>
+
+<!-- PAGE CONNEXION RESPONSABLE -->
+<div id="pageConnexion" style="display: none;">
+    <div class="header-vert"><h1>Hôpital Sakété-Ifangni</h1><p>🔐 Accès responsable</p></div>
+    <div class="login-container"><div class="card"><h2>Connexion Responsable</h2><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Mot de passe"><button onclick="connexion()" class="btn-vert">Se connecter</button><div id="loginError" class="alert-red" style="display:none;"></div></div></div>
+</div>
+
+<!-- PAGE CONNEXION TECHNICIEN -->
+<div id="pageConnexionTechnicien" style="display: none;">
+    <div class="header-violet"><h1>Hôpital Sakété-Ifangni</h1><p>🔐 Accès technicien</p></div>
+    <div class="login-container"><div class="card"><h2>Connexion Technicien</h2><input type="email" id="loginEmailTech" placeholder="Email"><input type="password" id="loginPasswordTech" placeholder="Mot de passe"><button onclick="connexionTechnicien()" class="btn-violet">Se connecter</button><div id="loginErrorTech" class="alert-red" style="display:none;"></div></div></div>
+</div>
+
+<!-- PAGE RESPONSABLE (MARRON) -->
+<div id="pageResponsable" style="display: none;">
+    <div class="header-marron"><h1>Espace Responsable Morgue</h1><button onclick="deconnexion()" class="btn-logout">🚪 Déconnexion</button></div>
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card"><div class="stat-number" id="statUrgent">0</div><div>🔴 Urgentes</div></div>
+            <div class="stat-card"><div class="stat-number" id="statPreventif">0</div><div>🟠 Préventives</div></div>
+            <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div>📋 Total tâches</div></div>
+            <div class="stat-card"><div class="stat-number" id="statReleves">0</div><div>📊 Relevés</div></div>
+        </div>
+        
+        <div id="notificationZone" style="display:none;" class="notification"></div>
+        
+        <!-- GRAPHIQUE -->
+        <div class="card">
+            <h2>📈 Évolution des températures</h2>
+            <canvas id="graphiqueTemp" width="800" height="300" style="max-width:100%; height:auto;"></canvas>
+            <p><small>📅 Vue mensuelle | 🔴 5°C = alerte | 🔴🔴 7°C = urgence</small></p>
+        </div>
+        
+        <!-- CALENDRIER -->
+        <div class="card">
+            <h2>📅 Calendrier de suivi mensuel</h2>
+            <div class="mois-navigation">
+                <button onclick="changerMois(-1)" class="btn-small">◀ Mois précédent</button>
+                <span id="moisActuel" style="font-size:18px; font-weight:bold; margin:0 20px;"></span>
+                <button onclick="changerMois(1)" class="btn-small">Mois suivant ▶</button>
+            </div>
+            <div style="overflow-x: auto; margin-top: 15px;">
+                <table id="calendrierTable" class="calendrier">
+                    <thead>
+                        <tr><th>Date</th><th>Heure</th><th>🌡️ Température</th><th>📊 Pression (bar)</th><th>⚡ Intensité (A)</th><th>🔋 Consommation (kW)</th><th>🔧 État compresseur</th><th>🔋 Tension batterie (V)</th><th>☀️ Production solaire (kWh)</th><th>🛢️ Pression huile (bar)</th><th>🌡️ Temp. extérieure (°C)</th><th>📝 Observations</th><th>✅ Actions</th><th>📷 Photo</th>
+                    </thead>
+                    <tbody id="calendrierBody"></tbody>
+                </table>
+            </div>
+            <div class="btn-group">
+                <button onclick="sauvegarderCalendrier()" class="btn">💾 Sauvegarder</button>
+                <button onclick="exporterCSV()" class="btn" style="background:#4caf50;">📎 Exporter CSV</button>
+            </div>
+        </div>
+        
+        <!-- CONFIGURATION DES INDICATEURS (DATES D'INSTALLATION) -->
+        <div class="card">
+            <h2>📊 Configuration des indicateurs (MTTR / MTBF)</h2>
+            <p>Saisissez une seule fois la date d'installation de chaque composant. Le système calculera automatiquement MTBF et MTTR.</p>
+            <div class="grid-3">
+                <div class="indicateur-card"><h3>🔧 Compresseur</h3><label>📅 Date d'installation</label><input type="date" id="date_install_compresseur"><div><strong>MTBF :</strong> <span id="mtbf_calc_compresseur">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_compresseur">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_compresseur">0</span></div></div>
+                <div class="indicateur-card"><h3>❄️ Évaporateur</h3><label>📅 Date d'installation</label><input type="date" id="date_install_evaporateur"><div><strong>MTBF :</strong> <span id="mtbf_calc_evaporateur">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_evaporateur">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_evaporateur">0</span></div></div>
+                <div class="indicateur-card"><h3>🌡️ Condenseur</h3><label>📅 Date d'installation</label><input type="date" id="date_install_condenseur"><div><strong>MTBF :</strong> <span id="mtbf_calc_condenseur">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_condenseur">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_condenseur">0</span></div></div>
+                <div class="indicateur-card"><h3>☀️ Panneaux solaires</h3><label>📅 Date d'installation</label><input type="date" id="date_install_panneaux"><div><strong>MTBF :</strong> <span id="mtbf_calc_panneaux">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_panneaux">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_panneaux">0</span></div></div>
+                <div class="indicateur-card"><h3>🔋 Batteries</h3><label>📅 Date d'installation</label><input type="date" id="date_install_batteries"><div><strong>MTBF :</strong> <span id="mtbf_calc_batteries">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_batteries">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_batteries">0</span></div></div>
+                <div class="indicateur-card"><h3>⚡ Onduleur hybride</h3><label>📅 Date d'installation</label><input type="date" id="date_install_onduleur"><div><strong>MTBF :</strong> <span id="mtbf_calc_onduleur">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_onduleur">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_onduleur">0</span></div></div>
+                <div class="indicateur-card"><h3>⚡ Contrôleur MPPT</h3><label>📅 Date d'installation</label><input type="date" id="date_install_mppt"><div><strong>MTBF :</strong> <span id="mtbf_calc_mppt">--</span> jours</div><div><strong>MTTR :</strong> <span id="mttr_calc_mppt">--</span> heures</div><div><strong>📊 Nombre de pannes :</strong> <span id="nb_pannes_mppt">0</span></div></div>
+            </div>
+            <button onclick="sauvegarderDatesInstallation()" class="btn">💾 Sauvegarder les dates</button>
+            <button onclick="calculerTousIndicateurs()" class="btn" style="background:#ff9800;">🔄 Recalculer MTBF/MTTR</button>
+            <div id="messageCalcul"></div>
+        </div>
+        
+        <!-- INDICATEURS MTTR / MTBF (AFFICHAGE) -->
+        <div class="card">
+            <h2>📊 Indicateurs de fiabilité (MTTR / MTBF)</h2>
+            <div class="grid-3">
+                <div class="indicateur-card"><h3>🔧 Compresseur</h3><label>MTBF (jours)</label><input type="number" id="mtbf_compresseur" placeholder="Ex: 180"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_compresseur" placeholder="Ex: 4"><div class="indicateur-statut" id="statut_compresseur"></div></div>
+                <div class="indicateur-card"><h3>❄️ Évaporateur</h3><label>MTBF (jours)</label><input type="number" id="mtbf_evaporateur" placeholder="Ex: 90"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_evaporateur" placeholder="Ex: 2"><div class="indicateur-statut" id="statut_evaporateur"></div></div>
+                <div class="indicateur-card"><h3>🌡️ Condenseur</h3><label>MTBF (jours)</label><input type="number" id="mtbf_condenseur" placeholder="Ex: 120"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_condenseur" placeholder="Ex: 3"><div class="indicateur-statut" id="statut_condenseur"></div></div>
+                <div class="indicateur-card"><h3>☀️ Panneaux solaires</h3><label>MTBF (jours)</label><input type="number" id="mtbf_panneaux" placeholder="Ex: 365"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_panneaux" placeholder="Ex: 6"><div class="indicateur-statut" id="statut_panneaux"></div></div>
+                <div class="indicateur-card"><h3>🔋 Batteries</h3><label>MTBF (jours)</label><input type="number" id="mtbf_batteries" placeholder="Ex: 180"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_batteries" placeholder="Ex: 2"><div class="indicateur-statut" id="statut_batteries"></div></div>
+                <div class="indicateur-card"><h3>⚡ Onduleur hybride</h3><label>MTBF (jours)</label><input type="number" id="mtbf_onduleur" placeholder="Ex: 150"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_onduleur" placeholder="Ex: 3"><div class="indicateur-statut" id="statut_onduleur"></div></div>
+                <div class="indicateur-card"><h3>⚡ Contrôleur MPPT</h3><label>MTBF (jours)</label><input type="number" id="mtbf_mppt" placeholder="Ex: 200"><label>MTTR (heures)</label><input type="number" step="0.5" id="mttr_mppt" placeholder="Ex: 2"><div class="indicateur-statut" id="statut_mppt"></div></div>
+            </div>
+            <button onclick="sauvegarderIndicateurs()" class="btn">💾 Sauvegarder indicateurs</button>
+            <div id="messageIndicateurs"></div>
+        </div>
+        
+        <!-- PLANIFICATION MAINTENANCE -->
+        <div class="card">
+            <h2>📅 Planifier une maintenance</h2>
+            <div class="grid-2">
+                <div><label>Date planifiée</label><input type="date" id="planifDate"></div>
+                <div><label>Composant</label><select id="planifComposant"><option>Compresseur</option><option>Évaporateur</option><option>Condenseur</option><option>Panneaux solaires</option><option>Batteries</option><option>Onduleur hybride</option><option>Contrôleur MPPT</option></select></div>
+                <div><label>Action à réaliser</label><input type="text" id="planifAction" placeholder="Description"></div>
+                <div><label>Technicien assigné</label><input type="text" id="planifTechnicien" placeholder="Nom du technicien"></div>
+            </div>
+            <button onclick="ajouterMaintenancePlanifiee()" class="btn">📅 Ajouter au planning</button>
+        </div>
+        
+        <!-- SIGNALEMENT PROBLÈME -->
+        <div class="card">
+            <h2>🚨 Signalement de problème</h2>
+            <div class="grid-2">
+                <div><label>👤 Votre nom</label><input type="text" id="signalNom" placeholder="Votre nom"></div>
+                <div><label>📞 Votre téléphone</label><input type="tel" id="signalTel" placeholder="Votre numéro"></div>
+                <div><label>🔧 Composant</label><select id="composantProbleme"><option>Compresseur</option><option>Évaporateur</option><option>Condenseur</option><option>Gaz R410A</option><option>Panneaux solaires</option><option>Batteries</option><option>Onduleur hybride</option><option>Contrôleur MPPT</option></select></div>
+                <div><label>📝 Type de problème</label><select id="typeProbleme"><option>Ne démarre pas</option><option>Bruit anormal</option><option>Fuite</option><option>Surchauffe</option></select></div>
+                <div><label>📝 Description</label><textarea id="descriptionProbleme" rows="2"></textarea></div>
+                <div><label>🔊 Bruits</label><select id="bruitEntendu"><option>Aucun</option><option>Claquement</option><option>Sifflement</option><option>Grincement</option></select></div>
+                <div><label>⚡ Urgence</label><select id="niveauUrgence"><option>Faible</option><option>Moyenne</option><option>Élevée</option><option>Critique</option></select></div>
+                <div><label>📸 Photo</label><input type="file" id="photoProbleme" accept="image/*"></div>
+            </div>
+            <button onclick="signalerProbleme()" class="btn">🚨 Envoyer l'alerte</button>
+            <div id="messageAlerte"></div>
+        </div>
+        
+        <!-- TÂCHES DE MAINTENANCE -->
+        <div class="card">
+            <h2>🔧 Tâches de maintenance</h2>
+            <div id="tachesList"></div>
+            <button onclick="toutTerminer()" class="btn" style="background:#4caf50;">✓ Tout marquer terminé</button>
+        </div>
+        
+        <!-- HISTORIQUE -->
+        <div class="card">
+            <h2>📊 Historique des relevés</h2>
+            <div id="historiqueList"></div>
+            <button onclick="exporterCSVHistorique()" class="btn" style="background:#ff9800;">📎 Exporter CSV historique</button>
+            <button onclick="effacerHistorique()" class="btn" style="background:#c62828;">🗑️ Effacer tout</button>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE TECHNICIEN (VIOLET) -->
+<div id="pageTechnicien" style="display: none;">
+    <div class="header-violet"><h1>Espace Technicien Maintenance</h1><button onclick="deconnexion()" class="btn-logout">🚪 Déconnexion</button></div>
+    <div class="container">
+        <div class="card"><h2>📈 Graphique des températures</h2><canvas id="graphiqueTempTech" width="800" height="300" style="max-width:100%; height:auto;"></canvas></div>
+        <div class="card"><h2>📋 Calendrier des relevés</h2><div style="overflow-x: auto;"><table id="calendrierTechTable" class="calendrier"><thead><tr><th>Date</th><th>Heure</th><th>Température</th><th>État compresseur</th><th>Observations</th></tr></thead><tbody id="calendrierTechBody"></tbody></table></div></div>
+        
+        <!-- INDICATEURS MTTR / MTBF (LECTURE SEULE) -->
+        <div class="card">
+            <h2>📊 Indicateurs de fiabilité (MTTR / MTBF)</h2>
+            <div class="grid-3" id="indicateursTech"></div>
+        </div>
+        
+        <div class="card"><h2>🚨 Alertes du responsable</h2><div id="alertesList"></div></div>
+        <div class="card"><h2>🔧 Tâches de maintenance</h2><div id="tachesTechnicienList"></div></div>
+        <div class="card"><h2>📅 Maintenances planifiées</h2><div id="planifList"></div></div>
+        <div class="card"><h2>✅ Interventions effectuées</h2><div id="interventionsList"></div><button onclick="supprimerToutesInterventions()" class="btn-red" style="margin-top:15px;">🗑️ Supprimer toutes les interventions</button></div>
+        
+        <!-- CHATBOT -->
+        <div id="chatbot" class="chatbot">
+            <div class="chatbot-header" onclick="toggleChatbot()">🤖 Assistant GMAO - Technicien</div>
+            <div class="chatbot-body" id="chatbotBody" style="display:none;">
+                <div class="chatbot-messages" id="chatMessages"><div class="bot-message">Bonjour technicien ! Je suis votre assistant. Posez-moi une question sur la maintenance.</div></div>
+                <div class="chatbot-input"><input type="text" id="chatInput" placeholder="Votre question..."><button onclick="envoyerMessageChatbot()">Envoyer</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
