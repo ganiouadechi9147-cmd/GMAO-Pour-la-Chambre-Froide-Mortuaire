@@ -10,12 +10,12 @@ let chartTemp = null;
 let chartTempTech = null;
 // ========== STOCKAGE CLOUD SUPABASE ==========
 async function chargerDonneesCloud() {
-    if (typeof supabase === 'undefined') {
+    if (typeof window.supabaseClient === 'undefined') {
         console.log("Supabase non disponible");
         return;
     }
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('donnees')
             .select('*');
         
@@ -43,6 +43,38 @@ async function chargerDonneesCloud() {
     }
 }
 
+async function sauvegarderDonneesCloud() {
+    if (typeof window.supabaseClient === 'undefined') return;
+    
+    let calendriers = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+        if (key.startsWith('calendrier_')) {
+            calendriers[key] = JSON.parse(localStorage.getItem(key));
+        }
+    }
+    
+    const toutesDonnees = [
+        { cle: 'taches', valeur: taches },
+        { cle: 'releves', valeur: releves },
+        { cle: 'alertes', valeur: alertes },
+        { cle: 'maintenancesPlanifiees', valeur: maintenancesPlanifiees },
+        { cle: 'interventions', valeur: interventions },
+        { cle: 'calendriers', valeur: calendriers }
+    ];
+    
+    try {
+        for (let item of toutesDonnees) {
+            const { error } = await window.supabaseClient
+                .from('donnees')
+                .upsert({ cle: item.cle, valeur: item.valeur }, { onConflict: 'cle' });
+            if (error) throw error;
+        }
+        console.log("✅ Données sauvegardées dans Supabase");
+    } catch (err) {
+        console.log("Erreur sauvegarde Supabase:", err);
+    }
+}
 async function sauvegarderDonneesCloud() {
     if (typeof supabase === 'undefined') return;
     
@@ -225,7 +257,6 @@ function sauvegarder() {
     localStorage.setItem('gmao_planifiees', JSON.stringify(maintenancesPlanifiees));
     localStorage.setItem('gmao_interventions', JSON.stringify(interventions));
     sauvegarderDonneesCloud()
-    mettreAJourStatsAccueil();  // ← AJOUTER CETTE LIGNE
 }
 
 // ========== CALENDRIER PAR MOIS ==========
@@ -1101,4 +1132,5 @@ function modifierNomResponsable() {
         rafraichir();
     }
 }
+changerDonneesCloud();
 verifierConnexionExistante();
