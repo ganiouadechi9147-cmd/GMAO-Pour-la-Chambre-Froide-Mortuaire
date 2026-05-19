@@ -62,8 +62,40 @@ function modifierChampCalendrier(id, champ, valeur) {
         }
     }
 }
-
-// ========== STOCKAGE CLOUD SUPABASE ==========
+function chargerDatesInstallation() {
+    if (typeof window.supabaseClient !== 'undefined') {
+        window.supabaseClient.from('donnees').select('*').eq('cle', 'dates_installation').then(res => {
+            if (res.data && res.data.length > 0) {
+                let dates = res.data[0].valeur;
+                localStorage.setItem('gmao_dates_installation', JSON.stringify(dates));
+                
+                let compresseur = document.getElementById('date_install_compresseur');
+                if (compresseur) compresseur.value = dates.compresseur || '';
+                
+                let evaporateur = document.getElementById('date_install_evaporateur');
+                if (evaporateur) evaporateur.value = dates.evaporateur || '';
+                
+                let condenseur = document.getElementById('date_install_condenseur');
+                if (condenseur) condenseur.value = dates.condenseur || '';
+                
+                let panneaux = document.getElementById('date_install_panneaux');
+                if (panneaux) panneaux.value = dates.panneaux || '';
+                
+                let batteries = document.getElementById('date_install_batteries');
+                if (batteries) batteries.value = dates.batteries || '';
+                
+                let onduleur = document.getElementById('date_install_onduleur');
+                if (onduleur) onduleur.value = dates.onduleur || '';
+                
+                let mppt = document.getElementById('date_install_mppt');
+                if (mppt) mppt.value = dates.mppt || '';
+                
+                calculerTousIndicateurs();
+                console.log("✅ Dates d'installation chargées depuis Supabase");
+            }
+        }).catch(err => console.log("Erreur chargement dates:", err));
+    }
+}
 async function chargerDonneesCloud() {
     if (typeof window.supabaseClient === 'undefined') {
         console.log("Supabase non disponible");
@@ -96,6 +128,7 @@ async function chargerDonneesCloud() {
     } catch (err) {
         console.log("Erreur chargement Supabase:", err);
     }
+    chargerDatesInstallation();
 }
 
 async function sauvegarderDonneesCloud() {
