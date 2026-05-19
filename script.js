@@ -111,30 +111,27 @@ async function sauvegarderDonneesCloud() {
     }
 }
 function mettreAJourStatsAccueil() {
-    console.log('Mise à jour des statistiques...');
-    
-    // 1. Dernière température (depuis releves)
+    // Lire les dernières données du cloud via la variable globale 'releves'
     if (releves.length > 0) {
         let dernier = releves[releves.length - 1];
         let derniereTemp = document.getElementById('derniereTemp');
         if (derniereTemp) derniereTemp.innerHTML = dernier.temperature + ' °C';
+        
+        let etatSolaire = document.getElementById('etatSolaireActuel');
+        if (etatSolaire) etatSolaire.innerHTML = dernier.solaire || '🟢 Vert';
     } else {
         let derniereTemp = document.getElementById('derniereTemp');
         if (derniereTemp) derniereTemp.innerHTML = '-- °C';
     }
     
-    // 2. État solaire
-    let etatSolaire = document.getElementById('etatSolaireActuel');
-    if (etatSolaire) etatSolaire.innerHTML = '🟢 Vert (Normal)';
-    
-    // 3. Dernière maintenance
+    // Dernière maintenance (depuis interventions)
     if (interventions.length > 0) {
         let derniere = interventions[interventions.length - 1];
         let derniereMaintenance = document.getElementById('derniereMaintenance');
         if (derniereMaintenance) derniereMaintenance.innerHTML = derniere.date.split(',')[0];
     }
     
-    // 4. Prochaine maintenance
+    // Prochaine maintenance (depuis taches non terminées)
     let tachesNonFaites = taches.filter(t => !t.fini);
     if (tachesNonFaites.length > 0) {
         let prochaine = tachesNonFaites[0];
@@ -621,6 +618,7 @@ function afficherStats() {
     document.getElementById('statPreventif').innerText = preventives;
     document.getElementById('statTotal').innerText = taches.length;
     document.getElementById('statReleves').innerText = releves.length;
+    console.log("Stats mises à jour - Relevés:", releves.length);
 }
 
 function afficherTaches() {
@@ -1079,7 +1077,10 @@ function rafraichir() {
     afficherStats();
     afficherTaches();
     afficherHistorique();
-    if (document.getElementById('pageResponsable').style.display !== 'none') afficherCalendrier();
+    mettreAJourStatsAccueil();
+    if (document.getElementById('pageResponsable').style.display !== 'none') { 
+        afficherCalendrier(); 
+    }
 }
 
 function verifierConnexionExistante() {
