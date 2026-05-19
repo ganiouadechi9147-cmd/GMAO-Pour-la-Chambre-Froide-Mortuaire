@@ -1220,13 +1220,16 @@ function sauvegarderDatesInstallation() {
         window.supabaseClient.from('donnees').upsert({ 
             cle: 'dates_installation', 
             valeur: dates 
-        }, { onConflict: 'cle' }).catch(err => console.log(err));
+        }, { onConflict: 'cle' }).then(() => {
+            console.log("✅ Dates sauvegardées dans Supabase");
+        }).catch(err => {
+            console.log("Erreur:", err);
+        });
     }
     
     alert("✅ Dates d'installation sauvegardées");
     calculerTousIndicateurs();
 }
-
 function calculerTousIndicateurs() {
     let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
     let aujourdhui = new Date();
