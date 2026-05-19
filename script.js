@@ -111,7 +111,8 @@ async function sauvegarderDonneesCloud() {
     }
 }
 function mettreAJourStatsAccueil() {
-    // Lire les dernières données du cloud via la variable globale 'releves'
+    console.log("Mise à jour stats accueil - Relevés:", releves.length);
+    
     if (releves.length > 0) {
         let dernier = releves[releves.length - 1];
         let derniereTemp = document.getElementById('derniereTemp');
@@ -124,14 +125,15 @@ function mettreAJourStatsAccueil() {
         if (derniereTemp) derniereTemp.innerHTML = '-- °C';
     }
     
-    // Dernière maintenance (depuis interventions)
     if (interventions.length > 0) {
         let derniere = interventions[interventions.length - 1];
         let derniereMaintenance = document.getElementById('derniereMaintenance');
         if (derniereMaintenance) derniereMaintenance.innerHTML = derniere.date.split(',')[0];
+    } else {
+        let derniereMaintenance = document.getElementById('derniereMaintenance');
+        if (derniereMaintenance) derniereMaintenance.innerHTML = '--';
     }
     
-    // Prochaine maintenance (depuis taches non terminées)
     let tachesNonFaites = taches.filter(t => !t.fini);
     if (tachesNonFaites.length > 0) {
         let prochaine = tachesNonFaites[0];
@@ -141,19 +143,6 @@ function mettreAJourStatsAccueil() {
         let prochaineMaintenance = document.getElementById('prochaineMaintenance');
         if (prochaineMaintenance) prochaineMaintenance.innerHTML = '--';
     }
-}
-// ========== GESTION DU NOM PRESPONSABLE ==========
-function getNomResponsable() {
-    let nom = localStorage.getItem('nom_responsable');
-    if (!nom) {
-        nom = prompt("📝 Veuillez entrer votre nom (responsable morgue) :", "Agent morgue");
-        if (nom && nom.trim() !== '') {
-            localStorage.setItem('nom_responsable', nom.trim());
-            return nom.trim();
-        }
-        return "Agent morgue";
-    }
-    return nom;
 }
 
 function modifierNomResponsable() {
