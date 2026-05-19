@@ -33,8 +33,6 @@ function modifierChampCalendrier(id, champ, valeur) {
         }
         mettreAJourGraphique();
         verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
-        
-        // Ajout à l'historique
         if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
             let nomResponsable = getNomResponsable();
             let etatComp = data[index].etatCompresseur || 'Normal';
@@ -107,9 +105,7 @@ function chargerIndicateursCloud() {
 function calculerTousIndicateurs() {
     let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
     let aujourdhui = new Date();
-    
     let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
-    
     for (let comp of composants) {
         let dateInstall = dates[comp];
         let mtbfSpan = document.getElementById(`mtbf_calc_${comp}`);
@@ -133,9 +129,7 @@ async function chargerDonneesCloud() {
         const { data, error } = await window.supabaseClient
             .from('donnees')
             .select('*');
-        
         if (error) throw error;
-        
         if (data && data.length > 0) {
             for (let item of data) {
                 if (item.cle === 'taches') taches = item.valeur;
@@ -158,10 +152,8 @@ async function chargerDonneesCloud() {
     }
     chargerDatesInstallation();
 }
-
 async function sauvegarderDonneesCloud() {
     if (typeof window.supabaseClient === 'undefined') return;
-    
     let calendriers = {};
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
@@ -178,7 +170,6 @@ async function sauvegarderDonneesCloud() {
         { cle: 'interventions', valeur: interventions },
         { cle: 'calendriers', valeur: calendriers }
     ];
-    
     try {
         for (let item of toutesDonnees) {
             const { error } = await window.supabaseClient
@@ -193,12 +184,10 @@ async function sauvegarderDonneesCloud() {
 }
 function mettreAJourStatsAccueil() {
     console.log("Mise à jour stats accueil - Relevés:", releves.length);
-    
     if (releves.length > 0) {
         let dernier = releves[releves.length - 1];
         let derniereTemp = document.getElementById('derniereTemp');
         if (derniereTemp) derniereTemp.innerHTML = dernier.temperature + ' °C';
-        
         let etatSolaire = document.getElementById('etatSolaireActuel');
         if (etatSolaire) etatSolaire.innerHTML = dernier.solaire || '🟢 Vert';
     } else {
@@ -225,7 +214,6 @@ function mettreAJourStatsAccueil() {
         if (prochaineMaintenance) prochaineMaintenance.innerHTML = '--';
     }
 }
-
 function modifierNomResponsable() {
     let nouveauNom = prompt("📝 Modifier votre nom :", localStorage.getItem('nom_responsable') || "Agent morgue");
     if (nouveauNom && nouveauNom.trim() !== '') {
@@ -234,28 +222,22 @@ function modifierNomResponsable() {
         rafraichir();
     }
 }
-// ========== UTILISATEURS ==========
 const UTILISATEURS = {
     responsable: { email: "responsable@hopital.com", password: "responsable123", role: "responsable" },
     technicien: { email: "technicien@hopital.com", password: "technicien123", role: "technicien" }
 };
-
-// ========== FONCTIONS D'AFFICHAGE ==========
 function afficherPageConnexion() {
     document.getElementById('pageAccueil').style.display = 'none';
     document.getElementById('pageConnexion').style.display = 'block';
 }
-
 function afficherPageConnexionTechnicien() {
     document.getElementById('pageAccueil').style.display = 'none';
     document.getElementById('pageConnexionTechnicien').style.display = 'block';
 }
-
 function connexion() {
     let email = document.getElementById('loginEmail').value;
     let pwd = document.getElementById('loginPassword').value;
     let errorDiv = document.getElementById('loginError');
-    
     if (email === UTILISATEURS.responsable.email && pwd === UTILISATEURS.responsable.password) {
         localStorage.setItem('gmao_role', 'responsable');
         document.getElementById('pageConnexion').style.display = 'none';
@@ -271,12 +253,10 @@ function connexion() {
         setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
     }
 }
-
 function connexionTechnicien() {
     let email = document.getElementById('loginEmailTech').value;
     let pwd = document.getElementById('loginPasswordTech').value;
     let errorDiv = document.getElementById('loginErrorTech');
-    
     if (email === UTILISATEURS.technicien.email && pwd === UTILISATEURS.technicien.password) {
         localStorage.setItem('gmao_role', 'technicien');
         document.getElementById('pageConnexionTechnicien').style.display = 'none';
@@ -303,16 +283,14 @@ function deconnexion() {
     if (chartTemp) chartTemp.destroy();
     if (chartTempTech) chartTempTech.destroy();
 }
-
 function chargerDonnees() {
     taches = JSON.parse(localStorage.getItem('gmao_taches') || '[]');
     releves = JSON.parse(localStorage.getItem('gmao_releves') || '[]');
     alertes = JSON.parse(localStorage.getItem('gmao_alertes') || '[]');
     maintenancesPlanifiees = JSON.parse(localStorage.getItem('gmao_planifiees') || '[]');
     interventions = JSON.parse(localStorage.getItem('gmao_interventions') || '[]');
-    mettreAJourStatsAccueil();  // ← AJOUTER CETTE LIGNE
+    mettreAJourStatsAccueil();  
 }
-
 function sauvegarder() {
     localStorage.setItem('gmao_taches', JSON.stringify(taches));
     localStorage.setItem('gmao_releves', JSON.stringify(releves));
@@ -321,23 +299,18 @@ function sauvegarder() {
     localStorage.setItem('gmao_interventions', JSON.stringify(interventions));
     sauvegarderDonneesCloud()
 }
-
-// ========== CALENDRIER PAR MOIS ==========
 function getJoursDansMois(annee, mois) {
     return new Date(annee, mois + 1, 0).getDate();
 }
-
 function afficherCalendrier() {
     let moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     let moisAffichage = document.getElementById('moisActuel');
     if (moisAffichage) {
         moisAffichage.innerText = moisNoms[moisActuel] + ' ' + anneeActuelle;
     }
-
     let nbJours = getJoursDansMois(anneeActuelle, moisActuel);
     let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
     let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
-
     if (data.length === 0) {
         data = [];
         for (let jour = 1; jour <= nbJours; jour++) {
@@ -364,11 +337,9 @@ function afficherCalendrier() {
         }
         localStorage.setItem(storageKey, JSON.stringify(data));
     }
-
     let tbody = document.getElementById('calendrierBody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
     for (let i = 0; i < data.length; i++) {
         let ligne = data[i];
         let row = tbody.insertRow();
@@ -391,7 +362,6 @@ function afficherCalendrier() {
     }
     ajouterEcouteursCalendrier();
 }
-
 function ajouterEcouteursCalendrier() {
     document.querySelectorAll('.temp-input').forEach(el => el.addEventListener('change', (e) => modifierChampCalendrier(e.target.dataset.id, 'temperature', e.target.value)));
     document.querySelectorAll('.pression-input').forEach(el => el.addEventListener('change', (e) => modifierChampCalendrier(e.target.dataset.id, 'pression', e.target.value)));
@@ -430,8 +400,6 @@ function modifierChampCalendrier(id, champ, valeur) {
                 calendriers[key] = JSON.parse(localStorage.getItem(key));
             }
         }
-        
-        // Envoyer au cloud
         if (typeof window.supabaseClient !== 'undefined') {
             window.supabaseClient.from('donnees').upsert({ 
                 cle: 'calendriers', 
@@ -442,17 +410,12 @@ function modifierChampCalendrier(id, champ, valeur) {
                 console.log("Erreur synchro calendrier:", err);
             });
         }
-        
         mettreAJourGraphique();
         verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
-        
-        // Ajout à l'historique
         if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
             let nomResponsable = getNomResponsable();
-            let etatComp = data[index].etatCompresseur || 'Normal';
-            
+            let etatComp = data[index].etatCompresseur || 'Normal'; 
             let existeDeja = releves.some(r => r.date === data[index].date + ' (' + data[index].heure + ')');
-            
             if (!existeDeja) {
                 releves.push({
                     date: data[index].date + ' (' + data[index].heure + ')',
@@ -466,18 +429,15 @@ function modifierChampCalendrier(id, champ, valeur) {
         }
     }
 }
-
 function sauvegarderCalendrier() {
     // Récupérer toutes les valeurs modifiées via les événements 'change'
     let moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     alert('✅ Calendrier de ' + moisNoms[moisActuel] + ' ' + anneeActuelle + ' sauvegardé');
     initialiserGraphique();
 }
-
 function changerMois(delta) {
     let nouveauMois = moisActuel + delta;
     let anneeModifiee = anneeActuelle;
-
     if (nouveauMois < 0) {
         nouveauMois = 11;
         anneeModifiee--;
@@ -488,22 +448,14 @@ function changerMois(delta) {
 
     moisActuel = nouveauMois;
     anneeActuelle = anneeModifiee;
-
-    // Mettre à jour l'affichage du mois
     let moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
     let moisAffichage = document.getElementById('moisActuel');
     if (moisAffichage) {
         moisAffichage.innerText = moisNoms[moisActuel] + ' ' + anneeActuelle;
     }
-
-    // Recharger le calendrier
     afficherCalendrier();
-    
-    // Recharger le graphique
     initialiserGraphique();
     if (chartTempTech) initialiserGraphiqueTechnicien();
-    
-    // Mettre à jour les statistiques de la page d'accueil
     mettreAJourStatsAccueil();
 }
 function afficherCalendrierTechnicien() {
@@ -524,7 +476,6 @@ function afficherCalendrierTechnicien() {
         `;
     }
 }
-
 function verifierAlerteTemperature(temp, date, heure) {
     let t = parseFloat(temp);
     if (!isNaN(t) && t > 5) {
@@ -541,14 +492,12 @@ function verifierAlerteTemperature(temp, date, heure) {
         }
     }
 }
-
 function genererMaintenance(type, composant, cause) {
     let newId = Date.now();
     taches.push({ id: newId, date: new Date().toLocaleString(), type: type, composant: composant, action: type === 'URGENT' ? 'Intervention immédiate' : 'Maintenance préventive', cause: cause, fini: false });
     sauvegarder();
     rafraichir();
 }
-
 function initialiserGraphique() {
     let ctx = document.getElementById('graphiqueTemp');
     if (!ctx) return;
@@ -586,12 +535,10 @@ function initialiserGraphique() {
         }
     });
 }
-
 function mettreAJourGraphique() {
     if (chartTemp) initialiserGraphique();
     if (chartTempTech) initialiserGraphiqueTechnicien();
 }
-
 function initialiserGraphiqueTechnicien() {
     let ctx = document.getElementById('graphiqueTempTech');
     if (!ctx) return;
@@ -629,7 +576,6 @@ function initialiserGraphiqueTechnicien() {
         }
     });
 }
-
 async function signalerProbleme() {
     let nom = document.getElementById('signalNom').value;
     let tel = document.getElementById('signalTel').value;
@@ -637,7 +583,6 @@ async function signalerProbleme() {
     let description = document.getElementById('descriptionProbleme').value;
     let bruit = document.getElementById('bruitEntendu').value;
     let urgence = document.getElementById('niveauUrgence').value;
-    
     if (!nom || !tel) {
         document.getElementById('messageAlerte').innerHTML = '<div class="alert-red">❌ Veuillez entrer votre nom et téléphone</div>';
         return;
@@ -646,7 +591,6 @@ async function signalerProbleme() {
         document.getElementById('messageAlerte').innerHTML = '<div class="alert-red">❌ Veuillez décrire le problème</div>';
         return;
     }
-    
     let date = new Date().toLocaleString();
     let newId = Date.now();
     alertes.push({ id: newId, date: date, nom: nom, tel: tel, composant: composant, description: description, bruit: bruit, urgence: urgence, traite: false });
@@ -661,7 +605,6 @@ async function signalerProbleme() {
     document.getElementById('messageAlerte').innerHTML = '<div class="alert-green">✅ Alerte enregistrée. Votre email va s\'ouvrir, cliquez sur Envoyer.</div>';
     setTimeout(() => document.getElementById('messageAlerte').innerHTML = '', 5000);
 }
-
 function ajouterMaintenancePlanifiee() {
     let date = document.getElementById('planifDate').value;
     let composant = document.getElementById('planifComposant').value;
@@ -675,7 +618,6 @@ function ajouterMaintenancePlanifiee() {
     document.getElementById('planifAction').value = '';
     document.getElementById('planifTechnicien').value = '';
 }
-
 function afficherMaintenancesPlanifiees() {
     let container = document.getElementById('planifList');
     if (!container) return;
@@ -687,7 +629,6 @@ function afficherMaintenancesPlanifiees() {
     }
     container.innerHTML = html;
 }
-
 function terminerPlanifiee(id) {
     let index = maintenancesPlanifiees.findIndex(m => m.id === id);
     if (index !== -1) {
@@ -698,28 +639,21 @@ function terminerPlanifiee(id) {
         afficherInterventions();
     }
 }
-
 function afficherStats() {
-    // Vérifier que les variables existent
     if (!taches) taches = [];
     if (!releves) releves = [];
-    
     let urgentes = taches.filter(t => t.type === 'URGENT' && !t.fini).length;
     let preventives = taches.filter(t => t.type === 'PREVENTIF' && !t.fini).length;
-    
     let statUrgent = document.getElementById('statUrgent');
     let statPreventif = document.getElementById('statPreventif');
     let statTotal = document.getElementById('statTotal');
     let statReleves = document.getElementById('statReleves');
-    
     if (statUrgent) statUrgent.innerText = urgentes;
     if (statPreventif) statPreventif.innerText = preventives;
     if (statTotal) statTotal.innerText = taches.length;
     if (statReleves) statReleves.innerText = releves.length;
-    
     console.log("Stats mises à jour - Relevés:", releves.length, "Tâches:", taches.length);
 }
-
 function afficherTaches() {
     let liste = taches.filter(t => !t.fini);
     if (liste.length === 0) { document.getElementById('tachesList').innerHTML = '<p>✅ Aucune maintenance en attente</p>'; return; }
@@ -731,7 +665,6 @@ function afficherTaches() {
     }
     document.getElementById('tachesList').innerHTML = html;
 }
-
 function afficherHistorique() {
     if (releves.length === 0) { document.getElementById('historiqueList').innerHTML = '<p>Aucun relevé</p>'; return; }
     let html = '';
@@ -742,19 +675,16 @@ function afficherHistorique() {
     }
     document.getElementById('historiqueList').innerHTML = html;
 }
-
 function terminerTache(id) {
     let t = taches.find(t => t.id === id);
     if (t) { t.fini = true; interventions.push({ id: Date.now(), date: new Date().toLocaleString(), composant: t.composant, action: t.action, type: 'Tâche' }); sauvegarder(); rafraichir(); afficherInterventions(); }
 }
-
 function toutTerminer() {
     if (confirm('Terminer toutes les maintenances ?')) {
         taches.forEach(t => { if (!t.fini) { t.fini = true; interventions.push({ id: Date.now(), date: new Date().toLocaleString(), composant: t.composant, action: t.action, type: 'Tâche' }); } });
         sauvegarder(); rafraichir(); afficherInterventions();
     }
 }
-
 function exporterCSV() {
     let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
     let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -779,7 +709,6 @@ function exporterCSV() {
     a.download = 'calendrier_' + (moisActuel+1) + '_' + anneeActuelle + '.csv';
     a.click();
 }
-
 function exporterCSVHistorique() {
     let csv = "Date,Température,Nom,Solaire\n";
     for (let r of releves) csv += '"' + r.date + '",' + r.temperature + ',"' + r.nom + '","' + r.solaire + '"\n';
@@ -788,18 +717,15 @@ function exporterCSVHistorique() {
     a.download = 'historique_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
 }
-
 function effacerHistorique() {
     if (confirm('Effacer TOUT l\'historique ?')) { taches = []; releves = []; alertes = []; sauvegarder(); rafraichir(); }
 }
-
 function afficherPageTechnicien() {
     afficherAlertesTechnicien();
     afficherTachesTechnicien();
     afficherMaintenancesPlanifiees();
     afficherInterventions();
 }
-
 function afficherAlertesTechnicien() {
     let alertesNonTraitees = alertes.filter(a => !a.traite);
     if (alertesNonTraitees.length === 0) { document.getElementById('alertesList').innerHTML = '<p>Aucune alerte</p>'; return; }
@@ -810,14 +736,11 @@ function afficherAlertesTechnicien() {
     }
     document.getElementById('alertesList').innerHTML = html;
 }
-
 function contacterMorguier(tel) { alert('📞 Contacter le responsable: ' + tel); }
-
 function traiterAlerte(id) {
     let a = alertes.find(a => a.id === id);
     if (a) { a.traite = true; sauvegarder(); afficherPageTechnicien(); rafraichir(); }
 }
-
 function afficherTachesTechnicien() {
     let tachesNonFaites = taches.filter(t => !t.fini);
     if (tachesNonFaites.length === 0) { document.getElementById('tachesTechnicienList').innerHTML = '<p>✅ Aucune tâche</p>'; return; }
@@ -828,12 +751,10 @@ function afficherTachesTechnicien() {
     }
     document.getElementById('tachesTechnicienList').innerHTML = html;
 }
-
 function terminerTacheTechnicien(id) {
     let t = taches.find(t => t.id === id);
     if (t) { t.fini = true; interventions.push({ id: Date.now(), date: new Date().toLocaleString(), composant: t.composant, action: t.action, type: 'Tâche' }); sauvegarder(); afficherPageTechnicien(); rafraichir(); }
 }
-
 function afficherInterventions() {
     let interventions = JSON.parse(localStorage.getItem('gmao_interventions') || '[]');
     let container = document.getElementById('interventionsList');
@@ -843,7 +764,6 @@ function afficherInterventions() {
         container.innerHTML = '<p>Aucune intervention</p>';
         return;
     }
-    
     let html = '';
     for (let i = interventions.length - 1; i >= 0; i--) {
         let inter = interventions[i];
@@ -855,29 +775,21 @@ function afficherInterventions() {
     }
     container.innerHTML = html;
 }
-
 function supprimerToutesInterventions() {
     if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUTES les interventions ? Cette action est définitive.')) {
-        // Vider le tableau des interventions
         interventions = [];
-        // Sauvegarder dans localStorage
         localStorage.setItem('gmao_interventions', JSON.stringify(interventions));
-        // Rafraîchir l'affichage
         afficherInterventions();
-        // Afficher un message de confirmation
         alert('✅ Toutes les interventions ont été supprimées');
-        // Recharger la page technicien pour être sûr
         if (typeof afficherPageTechnicien === 'function') {
             afficherPageTechnicien();
         }
     }
 }
-
 function toggleChatbot() {
     let b = document.getElementById('chatbotBody');
     if (b) b.style.display = b.style.display === 'none' ? 'flex' : 'none';
 }
-
 function envoyerMessageChatbot() {
     let input = document.getElementById('chatInput');
     let message = input.value.trim();
@@ -889,12 +801,9 @@ function envoyerMessageChatbot() {
     input.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-
 function repondreChatbot(message) {
     let msg = message.toLowerCase();
     let reponse = "";
-    
-    // ========== 1. COMPRESSEUR (5 sujets) ==========
     if (msg.includes('compresseur') && (msg.includes('marche') || msg.includes('fonctionne') || msg.includes('démarre') || msg.includes('ne démarre'))) {
         reponse = "🔧 Problème de compresseur qui ne démarre pas :\n\n1. Vérifiez le disjoncteur (position ON)\n2. Vérifiez les connexions électriques\n3. Vérifiez la pression d'huile\n4. Écoutez s'il y a un bourdonnement\n5. Vérifiez le condensateur de démarrage\n\nSi le problème persiste, utilisez le formulaire de signalement pour alerter le technicien.";
     }
@@ -910,8 +819,6 @@ function repondreChatbot(message) {
     else if (msg.includes('compresseur') && msg.includes('copeland')) {
         reponse = "🔧 Compresseur Copeland :\n\n• Marque fiable recommandée\n• Vérifiez la plaque signalétique\n• Entretien tous les 6 mois\n• Pièces de rechange disponibles\n\nContacter le fournisseur pour les réparations.";
     }
-    
-    // ========== 2. ÉVAPORATEUR (4 sujets) ==========
     else if (msg.includes('évaporateur') || msg.includes('evaporateur')) {
         if (msg.includes('givre') || msg.includes('gel')) {
             reponse = "❄️ Évaporateur qui givre :\n\n1. Givre excessif → dégivrez manuellement\n2. Vérifiez la sonde de dégivrage\n3. Contrôlez la résistance de dégivrage\n4. Vérifiez le programmateur\n5. Nettoyez les ailettes\n\nUn givre trop épais réduit les performances.";
@@ -926,8 +833,6 @@ function repondreChatbot(message) {
             reponse = "❄️ Évaporateur - Maintenance préventive :\n\n1. Nettoyage tous les 3 mois\n2. Vérification des ailettes\n3. Contrôle du dégivrage\n4. Inspection des fixations\n\nUn entretien régulier prolonge la durée de vie.";
         }
     }
-    
-    // ========== 3. CONDENSEUR (3 sujets) ==========
     else if (msg.includes('condenseur')) {
         if (msg.includes('sale') || msg.includes('poussière') || msg.includes('encrassé')) {
             reponse = "🧹 Condenseur encrassé :\n\n1. Nettoyez avec de l'air comprimé\n2. Utilisez une brosse douce\n3. Ne pas utiliser d'eau sous pression\n4. Nettoyez tous les 3 mois\n\nUn condenseur sale augmente la consommation électrique.";
@@ -939,8 +844,6 @@ function repondreChatbot(message) {
             reponse = "🌡️ Condenseur - Maintenance :\n\n1. Nettoyage des ailettes\n2. Vérification du ventilateur\n3. Contrôle de la pression\n4. Inspection des soudures\n\nUn condenseur entretenu dure plus longtemps.";
         }
     }
-    
-    // ========== 4. GAZ R404A (3 sujets) ==========
     else if (msg.includes('gaz') || msg.includes('r404a') || msg.includes('fluide')) {
         if (msg.includes('fuite')) {
             reponse = "💨 Fuite de gaz R404A :\n\n1. Utilisez un détecteur électronique\n2. Ou de l'eau savonneuse (bulles)\n3. Réparez la fuite immédiatement\n4. Rechargez le circuit\n5. Vérifiez les soudures\n\n⚠️ Urgence : Alertez le technicien !";
@@ -952,8 +855,6 @@ function repondreChatbot(message) {
             reponse = "💨 Gaz frigorigène R404A :\n\n• Gaz écologique (ne détruit pas l'ozone)\n• Pression plus élevée que R404A\n• Ne pas mélanger avec d'autres gaz\n• Manipulation par personnel qualifié\n\nLa recharge doit être faite par un technicien.";
         }
     }
-    
-    // ========== 5. TEMPÉRATURE (4 sujets) ==========
     else if (msg.includes('température')) {
         if (msg.includes('trop élevée') || msg.includes('chaude') || msg.includes('>')) {
             reponse = "🌡️ Température trop élevée (>5°C) :\n\n1. Vérifiez que les portes sont bien fermées\n2. Vérifiez les joints d'étanchéité\n3. Vérifiez le niveau de gaz\n4. Nettoyez le condenseur\n5. Vérifiez l'évaporateur\n\nUtilisez le formulaire de relevé pour enregistrer la température exacte.";
@@ -968,8 +869,6 @@ function repondreChatbot(message) {
             reponse = "🌡️ Gestion de la température :\n\n1. Relevés quotidiens dans le calendrier\n2. Température normale : 0-5°C\n3. Alerte orange à 5°C\n4. Alerte rouge à 7°C\n5. Graphique d'évolution disponible\n\nUtilisez le formulaire de signalement en cas d'anomalie.";
         }
     }
-    
-    // ========== 6. THERMOSTAT (2 sujets) ==========
     else if (msg.includes('thermostat')) {
         if (msg.includes('réglage') || msg.includes('calibrer')) {
             reponse = "🎛️ Réglage du thermostat :\n\n1. Température cible : 2°C à 4°C\n2. Ne pas descendre en dessous de 0°C\n3. Utiliser un thermomètre de référence\n4. Calibration annuelle recommandée\n\nUn mauvais réglage peut causer du givre.";
@@ -978,8 +877,6 @@ function repondreChatbot(message) {
             reponse = "🌡️ Thermostat - Vérification :\n\n1. Comparez avec un thermomètre fiable\n2. Écart > 1°C → sonde à remplacer\n3. Vérifiez le câblage\n4. Testez le cycle de fonctionnement\n\nUn thermostat précis est essentiel.";
         }
     }
-    
-    // ========== 7. VENTILATEUR (2 sujets) ==========
     else if (msg.includes('ventilateur')) {
         if (msg.includes('bruit') || msg.includes('grincement')) {
             reponse = "🔊 Ventilateur bruyant :\n\n1. Grincement → roulements usés\n2. Claquement → pale qui touche\n3. Vibration → déséquilibre\n4. Nettoyez les pales\n5. Graissez les roulements\n\nUn ventilateur défectueux réduit le débit d'air.";
@@ -988,8 +885,6 @@ function repondreChatbot(message) {
             reponse = "💨 Ventilateur - Contrôle :\n\n1. Vérifiez la rotation\n2. Nettoyez les pales de poussière\n3. Vérifiez le moteur\n4. Testez les vitesses\n5. Écoutez les bruits anormaux\n\nNettoyage recommandé tous les 3 mois.";
         }
     }
-    
-    // ========== 8. PANNEAUX SOLAIRES (5 sujets) ==========
     else if (msg.includes('panneau') || msg.includes('solaire') || msg.includes('photovoltaïque') || msg.includes('pv')) {
         if (msg.includes('ne produit') || msg.includes('production') || msg.includes('faible')) {
             reponse = "☀️ Production solaire faible :\n\n1. Nettoyez les panneaux (eau + éponge douce)\n2. Vérifiez qu'il n'y a pas d'ombrage\n3. Vérifiez l'orientation (plein sud)\n4. Contrôlez l'inclinaison\n5. Vérifiez les connexions\n6. Inspectez les câbles\n\nPerte > 20% → signaler au technicien.";
@@ -1007,8 +902,6 @@ function repondreChatbot(message) {
             reponse = "☀️ Panneaux photovoltaïques :\n\n• Nettoyage tous les 15 jours\n• Production normale : 5-10 kWh/jour\n• Durée de vie : 20-25 ans\n• Vérifiez l'ombrage\n• Inspection visuelle régulière\n\nUtilisez le calendrier pour noter la production.";
         }
     }
-    
-    // ========== 9. BATTERIES (5 sujets) ==========
     else if (msg.includes('batterie')) {
         if (msg.includes('tension') || msg.includes('charge')) {
             reponse = "🔋 Tension des batteries :\n\n• Batterie 12V : normale 12V-13.5V\n• Batterie 48V : normale 46V-54V\n• Tension basse (<11.5V) → déchargée\n• Tension haute (>14.5V) → surcharge\n• Mesurez avec un voltmètre\n\nVérification mensuelle recommandée.";
@@ -1026,8 +919,6 @@ function repondreChatbot(message) {
             reponse = "🔋 Batteries de stockage :\n\n• Vérification mensuelle de tension\n• Nettoyage des bornes\n• Éviter les décharges profondes\n• Température ambiante 15-25°C\n• Durée de vie 5-7 ans\n\nBatteries bien entretenues = autonomie garantie.";
         }
     }
-    
-    // ========== 10. ONDULEUR (4 sujets) ==========
     else if (msg.includes('onduleur') || msg.includes('mppt')) {
         if (msg.includes('panne') || msg.includes('ne démarre') || msg.includes('erreur')) {
             reponse = "⚡ Onduleur en panne :\n\n1. Vérifiez les voyants LED\n2. Redémarrez l'onduleur\n3. Vérifiez les fusibles\n4. Contrôlez la ventilation\n5. Vérifiez la batterie\n\nCode erreur → consulter la notice.";
@@ -1042,8 +933,6 @@ function repondreChatbot(message) {
             reponse = "⚡ Onduleur / MPPT :\n\n• Contrôle des voyants chaque semaine\n• Nettoyage ventilation\n• Vérification des fusibles\n• Température de fonctionnement\n• Redémarrage si erreur\n\nUn onduleur bien entretenu = alimentation stable.";
         }
     }
-    
-    // ========== 11. RÉGULATEUR (3 sujets) ==========
     else if (msg.includes('régulateur') || msg.includes('regulateur')) {
         if (msg.includes('charge')) {
             reponse = "📊 Régulateur de charge :\n\n• Vérifiez la tension de charge\n• Courant de charge normal\n• Évitez la surcharge\n• Protection contre les inversions\n• Test mensuel recommandé\n\nUn bon régulateur protège les batteries.";
@@ -1055,8 +944,6 @@ function repondreChatbot(message) {
             reponse = "📊 Régulateur MPPT :\n\n• Optimise la production solaire\n• Convertit le surplus en charge\n• Protection des batteries\n• Affichage des paramètres\n• Surveillance régulière\n\nAméliore le rendement énergétique.";
         }
     }
-    
-    // ========== 12. MAINTENANCE (5 sujets) ==========
     else if (msg.includes('maintenance préventive') || (msg.includes('maintenance') && msg.includes('préventive'))) {
         reponse = "📋 Maintenance préventive :\n\nPlanification recommandée :\n• Hebdomadaire : vérification visuelle\n• Mensuelle : nettoyage, contrôles\n• Trimestrielle : tests approfondis\n• Annuelle : révision complète\n\nCalendrier disponible dans l'espace responsable.";
     }
@@ -1072,8 +959,6 @@ function repondreChatbot(message) {
     else if (msg.includes('rapport') || msg.includes('export')) {
         reponse = "📊 Export des données :\n\n• CSV : calendrier mensuel\n• CSV : historique complet\n• Utilisation dans Excel\n• Impression possible\n• Archivage des données\n\nExportez régulièrement pour sauvegarde.";
     }
-    
-    // ========== 13. SÉCURITÉ (4 sujets) ==========
     else if (msg.includes('sécurité') || msg.includes('danger')) {
         reponse = "⚠️ Consignes de sécurité :\n\n1. Coupez toujours l'alimentation avant intervention\n2. Portez des gants isolants\n3. Ne touchez pas les composants sous tension\n4. Utilisez des outils isolés\n5. Ne travaillez jamais seul\n\nLa sécurité est primordiale.";
     }
@@ -1086,8 +971,6 @@ function repondreChatbot(message) {
     else if (msg.includes('incendie') || msg.includes('feu')) {
         reponse = "🔥 Risque incendie :\n\n1. Coupez l'alimentation générale\n2. Utilisez un extincteur adapté (CO2)\n3. Ne pas utiliser d'eau\n4. Évacuez la zone\n5. Alertez les pompiers\n\nPrévention : vérifiez les câbles régulièrement.";
     }
-    
-    // ========== 14. ÉCONOMIE D'ÉNERGIE (3 sujets) ==========
     else if (msg.includes('économie') || msg.includes('consommation') || msg.includes('énergie')) {
         if (msg.includes('réduction')) {
             reponse = "📉 Réduction de consommation :\n\n1. Maintenance préventive régulière\n2. Nettoyage des échangeurs\n3. Vérification de l'isolation\n4. Optimisation du dégivrage\n5. Horaires de fonctionnement\n\nJusqu'à 30% d'économies possibles.";
@@ -1099,8 +982,6 @@ function repondreChatbot(message) {
     else if (msg.includes('performance')) {
         reponse = "📈 Performance énergétique :\n\n• COP (Coefficient de Performance)\n• Suivi des températures\n• Production solaire journalière\n• Consommation électrique\n• Indicateurs MTBF/MTTR\n\nDes équipements performants = économies.";
     }
-    
-    // ========== 15. NOUVEAUX SUJETS (équipements supplémentaires) ==========
     else if (msg.includes('détendeur')) {
         reponse = "🔧 Détendeur thermostatique :\n\n• Régule le flux de gaz\n• Vérifiez la surchauffe (5-8°C)\n• Nettoyez le filtre\n• Testez le bulbe\n• Un détendeur bloqué = panne\n\nIntervention par technicien qualifié.";
     }
@@ -1131,8 +1012,6 @@ function repondreChatbot(message) {
     else if (msg.includes('vanne') || msg.includes('4 voies')) {
         reponse = "🔧 Vanne 4 voies :\n\n• Utilisée pour le dégivrage\n• Écoutez le bruit d'inversion\n• Pas de bruit = vanne bloquée\n• Vérifiez la bobine\n• Intervention par technicien\n\nUne vanne bloquée empêche le dégivrage.";
     }
-    
-    // ========== 16. FUITES ET PROBLÈMES DIVERS (4 sujets) ==========
     else if (msg.includes('fuite') && (msg.includes('eau') || msg.includes('liquide'))) {
         reponse = "💧 Fuite d'eau détectée :\n\n1. Coupez immédiatement l'alimentation\n2. Placez un récipient sous la fuite\n3. Identifiez la source (évaporateur, joint)\n4. Vérifiez le bac de récupération\n5. Nettoyez le tuyau d'évacuation\n\nURGENCE : Alertez le technicien immédiatement !";
     }
@@ -1145,8 +1024,6 @@ function repondreChatbot(message) {
     else if (msg.includes('panne') || msg.includes('coupure')) {
         reponse = "⚠️ En cas de panne :\n\n1. Utilisez le formulaire de signalement\n2. Décrivez précisément le problème\n3. Ajoutez une photo si possible\n4. Le technicien est alerté par email\n5. Intervention rapide\n\nNe tentez pas de réparer vous-même.";
     }
-    
-    // ========== 17. INFORMATIONS GÉNÉRALES (4 sujets) ==========
     else if (msg.includes('contact') || msg.includes('téléphone') || msg.includes('appeler')) {
         reponse = "📞 Contacts utiles :\n\n• Personne d'urgence : +229 01 91 47 32 41\n• Technicien maintenance : +229 01 66 55 55 69\n• Standard hôpital : +229 21 33 21 78\n• Email : infos@sante.gouv.bj\n\nCes numéros sont disponibles sur la page d'accueil.";
     }
@@ -1159,19 +1036,15 @@ function repondreChatbot(message) {
     else if (msg.includes('aide') || msg.includes('assistance')) {
         reponse = "🆘 Aide et assistance :\n\n1. Utilisez ce chatbot pour les questions simples\n2. Consultez la FAQ dans les liens utiles\n3. Pour une panne : formulaire de signalement\n4. Urgence : appelez la personne d'urgence\n5. Le technicien est alerté automatiquement\n\nNous sommes là pour vous aider !";
     }
-    
-    // ========== RÉPONSE PAR DÉFAUT ==========
     else {
         reponse = "🤖 Je suis l'assistant GMAO.\n\nVous pouvez me poser des questions sur :\n\n❄️ GROUPE FROID :\n• Compresseur (panne, bruit, huile,)\n• Évaporateur (givre, refroidissement, fuite)\n• Condenseur (encrassement, surchauffe)\n• Gaz R404A (fuite, pression)\n• Thermostat, ventilateur, détendeur, filtre\n\n☀️ ÉNERGIE SOLAIRE :\n• Panneaux photovoltaïques (production, nettoyage)\n• Batteries (tension, décharge, remplacement)\n• Onduleur / MPPT (panne, ventilation, hybride)\n• Régulateur de charge\n\n📋 MAINTENANCE :\n• Maintenance préventive et corrective\n• Planification des tâches\n• Export des données (CSV)\n\n🔧 DÉPANNAGE :\n• Fuites (eau, gaz)\n• Sécurité électrique\n• Urgences et alertes\n\nSinon, utilisez le formulaire de signalement pour alerter le technicien immédiatement.";
     }
-    
     let chatMessages = document.getElementById('chatMessages');
     if (chatMessages) {
         chatMessages.innerHTML += '<div class="bot-message">' + reponse.replace(/\n/g, '<br>') + '</div>';
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 }
-
 function rafraichir() {
     afficherStats();
     afficherTaches();
@@ -1181,10 +1054,8 @@ function rafraichir() {
         afficherCalendrier(); 
     }
 }
-
 function verifierConnexionExistante() {
     let role = localStorage.getItem('gmao_role');
-    
     if (role === 'responsable') {
         document.getElementById('pageAccueil').style.display = 'none';
         document.getElementById('pageConnexion').style.display = 'none';
@@ -1193,7 +1064,7 @@ function verifierConnexionExistante() {
         afficherCalendrier();
         rafraichir();
         initialiserGraphique();
-        mettreAJourStatsAccueil();  // Met à jour les 4 cartes
+        mettreAJourStatsAccueil();  
     } 
     else if (role === 'technicien') {
         document.getElementById('pageAccueil').style.display = 'none';
@@ -1205,7 +1076,6 @@ function verifierConnexionExistante() {
         initialiserGraphiqueTechnicien();
     }
 }
-// ========== GESTION DU NOM DU RESPONSABLE ==========
 function getNomResponsable() {
     let nom = localStorage.getItem('nom_responsable');
     if (!nom) {
@@ -1219,7 +1089,6 @@ function getNomResponsable() {
     }
     return nom;
 }
-
 function modifierNomResponsable() {
     let nouveauNom = prompt("📝 Modifier votre nom :", localStorage.getItem('nom_responsable') || "Responsable morgue");
     if (nouveauNom && nouveauNom.trim() !== '') {
@@ -1228,7 +1097,6 @@ function modifierNomResponsable() {
         rafraichir();
     }
 }
-// ========== INDICATEURS MTTR/MTBF ==========
 function sauvegarderIndicateurs() {
     let indicateurs = {
         mtbf_compresseur: document.getElementById('mtbf_compresseur')?.value || 0,
@@ -1246,9 +1114,7 @@ function sauvegarderIndicateurs() {
         mtbf_mppt: document.getElementById('mtbf_mppt')?.value || 0,
         mttr_mppt: document.getElementById('mttr_mppt')?.value || 0
     };
-    
     localStorage.setItem('gmao_indicateurs', JSON.stringify(indicateurs));
-    
     if (typeof window.supabaseClient !== 'undefined') {
         window.supabaseClient.from('donnees').upsert({ 
             cle: 'indicateurs', 
@@ -1263,7 +1129,6 @@ function sauvegarderIndicateurs() {
     }
     mettreAJourStatuts();
 }
-
 function sauvegarderDatesInstallation() {
     let dates = {
         compresseur: document.getElementById('date_install_compresseur')?.value,
@@ -1274,9 +1139,7 @@ function sauvegarderDatesInstallation() {
         onduleur: document.getElementById('date_install_onduleur')?.value,
         mppt: document.getElementById('date_install_mppt')?.value
     };
-    
     localStorage.setItem('gmao_dates_installation', JSON.stringify(dates));
-    
     if (typeof window.supabaseClient !== 'undefined') {
         window.supabaseClient.from('donnees').upsert({ 
             cle: 'dates_installation', 
@@ -1310,9 +1173,7 @@ function sauvegarderIndicateurs() {
         mtbf_mppt: document.getElementById('mtbf_mppt')?.value || 0,
         mttr_mppt: document.getElementById('mttr_mppt')?.value || 0
     };
-    
     localStorage.setItem('gmao_indicateurs', JSON.stringify(indicateurs));
-    
     if (typeof window.supabaseClient !== 'undefined') {
         window.supabaseClient.from('donnees').upsert({ 
             cle: 'indicateurs', 
@@ -1323,13 +1184,11 @@ function sauvegarderIndicateurs() {
             console.log("Erreur:", err);
         });
     }
-    
     let msgDiv = document.getElementById('messageIndicateurs');
     if (msgDiv) {
         msgDiv.innerHTML = '<div class="alert-green">✅ Indicateurs sauvegardés</div>';
         setTimeout(() => msgDiv.innerHTML = '', 3000);
     }
-    
     if (typeof mettreAJourStatuts === 'function') {
         mettreAJourStatuts();
     }
@@ -1337,9 +1196,7 @@ function sauvegarderIndicateurs() {
 function calculerTousIndicateurs() {
     let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
     let aujourdhui = new Date();
-    
     let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
-    
     for (let comp of composants) {
         let dateInstall = dates[comp];
         if (dateInstall) {
@@ -1350,16 +1207,12 @@ function calculerTousIndicateurs() {
         }
     }
 }
-
 function mettreAJourStatuts() {
     let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
-    
     let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
-    
     for (let comp of composants) {
         let mtbf = indicateurs[`mtbf_${comp}`] || 0;
         let statutDiv = document.getElementById(`statut_${comp}`);
-        
         if (statutDiv) {
             if (mtbf > 200) {
                 statutDiv.innerHTML = '✅ Excellent';
@@ -1377,10 +1230,8 @@ function mettreAJourStatuts() {
         }
     }
 }
-
 function chargerIndicateurs() {
     let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
-    
     document.getElementById('mtbf_compresseur').value = indicateurs.mtbf_compresseur || '';
     document.getElementById('mttr_compresseur').value = indicateurs.mttr_compresseur || '';
     document.getElementById('mtbf_evaporateur').value = indicateurs.mtbf_evaporateur || '';
@@ -1395,15 +1246,12 @@ function chargerIndicateurs() {
     document.getElementById('mttr_onduleur').value = indicateurs.mttr_onduleur || '';
     document.getElementById('mtbf_mppt').value = indicateurs.mtbf_mppt || '';
     document.getElementById('mttr_mppt').value = indicateurs.mttr_mppt || '';
-    
     mettreAJourStatuts();
 }
-
 function afficherIndicateursTechnicien() {
     let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
     let container = document.getElementById('indicateursTech');
     if (!container) return;
-    
     let composants = [
         { id: 'compresseur', nom: '🔧 Compresseur', mtbf: indicateurs.mtbf_compresseur, mttr: indicateurs.mttr_compresseur },
         { id: 'evaporateur', nom: '❄️ Évaporateur', mtbf: indicateurs.mtbf_evaporateur, mttr: indicateurs.mttr_evaporateur },
@@ -1413,7 +1261,6 @@ function afficherIndicateursTechnicien() {
         { id: 'onduleur', nom: '⚡ Onduleur hybride', mtbf: indicateurs.mtbf_onduleur, mttr: indicateurs.mttr_onduleur },
         { id: 'mppt', nom: '⚡ Contrôleur MPPT', mtbf: indicateurs.mtbf_mppt, mttr: indicateurs.mttr_mppt }
     ];
-    
     let html = '';
     for (let comp of composants) {
         let statut = '';
@@ -1430,7 +1277,6 @@ function afficherIndicateursTechnicien() {
         } else {
             statut = '⚪ Non renseigné';
         }
-        
         html += `
             <div class="indicateur-card">
                 <h3>${comp.nom}</h3>
@@ -1442,6 +1288,6 @@ function afficherIndicateursTechnicien() {
     }
     container.innerHTML = html;
 }
-
 chargerDonneesCloud();
+chargerIndicateursCloud();
 verifierConnexionExistante();
