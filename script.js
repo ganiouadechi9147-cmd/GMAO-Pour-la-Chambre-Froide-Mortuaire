@@ -333,40 +333,58 @@ function ajouterEcouteursCalendrier() {
     }));
 }
 function modifierChampCalendrier(id, champ, valeur) {
-            let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
-            let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            let index = data.findIndex(d => d.id == id);
-            
-            if (index !== -1) {
-                data[index][champ] = valeur;
-                localStorage.setItem(storageKey, JSON.stringify(data));
-                mettreAJourGraphique();
-                verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
-                
-                // ========== AJOUT AUTOMATIQUE À L'HISTORIQUE ==========
-                if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
-                    // Récupérer le nom du responsable (demande une seule fois)
-                    let nomResponsable = getNomResponsable();
-                    let etatComp = data[index].etatCompresseur || 'Normal';
-                    
-                    // Vérifier si ce relevé existe déjà dans l'historique
-                    let existeDeja = releves.some(r => r.date === data[index].date + ' (' + data[index].heure + ')');
-                    
-                    if (!existeDeja) {
-                        releves.push({
-                            date: data[index].date + ' (' + data[index].heure + ')',
-                            temperature: parseFloat(data[index].temperature),
-                            nom: nomResponsable,
-                            solaire: etatComp
-                        });
-                        sauvegarder();
-                        rafraichir();
-                        console.log('✅ Relevé ajouté à l\'historique:', data[index].date, data[index].heure, data[index].temperature);
-                    }
-                }
-                // ========== FIN AJOUT ==========
+    let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
+    let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    let index = data.findIndex(d => d.id == id);
+    
+    if (index !== -1) {
+        data[index][champ] = valeur;
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        
+        // Sauvegarde dans Supabase
+        let calendriers = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if (key.startsWith('calendrier_')) {
+                calendriers[key] = JSON.parse(localStorage.getItem(key));
             }
         }
+        
+        // Envoyer au cloud
+        if (typeof window.supabaseClient !== 'undefined') {
+            window.supabaseClient.from('donnees').upsert({ 
+                cle: 'calendriers', 
+                valeur: calendriers 
+            }, { onConflict: 'cle' }).then(() => {
+                console.log("✅ Calendrier synchronisé avec Supabase");
+            }).catch(err => {
+                console.log("Erreur synchro calendrier:", err);
+            });
+        }
+        
+        mettreAJourGraphique();
+        verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
+        
+        // Ajout à l'historique
+        if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
+            let nomResponsable = getNomResponsable();
+            let etatComp = data[index].etatCompresseur || 'Normal';
+            
+            let existeDeja = releves.some(r => r.date === data[index].date + ' (' + data[index].heure + ')');
+            
+            if (!existeDeja) {
+                releves.push({
+                    date: data[index].date + ' (' + data[index].heure + ')',
+                    temperature: parseFloat(data[index].temperature),
+                    nom: nomResponsable,
+                    solaire: etatComp
+                });
+                sauvegarder();
+                rafraichir();
+            }
+        }
+    }
+}
 
 function sauvegarderCalendrier() {
     // Récupérer toutes les valeurs modifiées via les événements 'change'
