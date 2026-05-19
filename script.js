@@ -9,37 +9,57 @@ let anneeActuelle = new Date().getFullYear();
 let chartTemp = null;
 let chartTempTech = null;
 // ========== STOCKAGE CLOUD SUPABASE ==========
-async function chargerDonneesCloud() {
-    if (typeof window.supabaseClient === 'undefined') {
-        console.log("Supabase non disponible");
-        return;
-    }
-    try {
-        const { data, error } = await window.supabaseClient
-            .from('donnees')
-            .select('*');
+function modifierChampCalendrier(id, champ, valeur) {
+    let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
+    let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    let index = data.findIndex(d => d.id == id);
+    
+    if (index !== -1) {
+        data[index][champ] = valeur;
+        localStorage.setItem(storageKey, JSON.stringify(data));
         
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-            for (let item of data) {
-                if (item.cle === 'taches') taches = item.valeur;
-                if (item.cle === 'releves') releves = item.valeur;
-                if (item.cle === 'alertes') alertes = item.valeur;
-                if (item.cle === 'maintenancesPlanifiees') maintenancesPlanifiees = item.valeur;
-                if (item.cle === 'interventions') interventions = item.valeur;
-                if (item.cle === 'calendriers') {
-                    for (let key in item.valeur) {
-                        localStorage.setItem(key, JSON.stringify(item.valeur[key]));
-                    }
-                }
+        // Sauvegarde dans Supabase
+        let calendriers = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if (key.startsWith('calendrier_')) {
+                calendriers[key] = JSON.parse(localStorage.getItem(key));
             }
-            rafraichir();
-            if (typeof initialiserGraphique === 'function') initialiserGraphique();
-            console.log("✅ Données chargées depuis Supabase");
         }
-    } catch (err) {
-        console.log("Erreur chargement Supabase:", err);
+        
+        // Envoyer au cloud
+        if (typeof window.supabaseClient !== 'undefined') {
+            window.supabaseClient.from('donnees').upsert({ 
+                cle: 'calendriers', 
+                valeur: calendriers 
+            }, { onConflict: 'cle' }).then(() => {
+                console.log("✅ Calendrier synchronisé avec Supabase");
+            }).catch(err => {
+                console.log("Erreur synchro calendrier:", err);
+            });
+        }
+        
+        mettreAJourGraphique();
+        verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
+        
+        // Ajout à l'historique
+        if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
+            let nomResponsable = getNomResponsable();
+            let etatComp = data[index].etatCompresseur || 'Normal';
+            
+            let existeDeja = releves.some(r => r.date === data[index].date + ' (' + data[index].heure + ')');
+            
+            if (!existeDeja) {
+                releves.push({
+                    date: data[index].date + ' (' + data[index].heure + ')',
+                    temperature: parseFloat(data[index].temperature),
+                    nom: nomResponsable,
+                    solaire: etatComp
+                });
+                sauvegarder();
+                rafraichir();
+            }
+        }
     }
 }
 
