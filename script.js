@@ -43,6 +43,41 @@ async function chargerDonneesCloud() {
     }
 }
 
+// ========== STOCKAGE CLOUD SUPABASE ==========
+async function chargerDonneesCloud() {
+    if (typeof window.supabaseClient === 'undefined') {
+        console.log("Supabase non disponible");
+        return;
+    }
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('donnees')
+            .select('*');
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+            for (let item of data) {
+                if (item.cle === 'taches') taches = item.valeur;
+                if (item.cle === 'releves') releves = item.valeur;
+                if (item.cle === 'alertes') alertes = item.valeur;
+                if (item.cle === 'maintenancesPlanifiees') maintenancesPlanifiees = item.valeur;
+                if (item.cle === 'interventions') interventions = item.valeur;
+                if (item.cle === 'calendriers') {
+                    for (let key in item.valeur) {
+                        localStorage.setItem(key, JSON.stringify(item.valeur[key]));
+                    }
+                }
+            }
+            rafraichir();
+            if (typeof initialiserGraphique === 'function') initialiserGraphique();
+            console.log("✅ Données chargées depuis Supabase");
+        }
+    } catch (err) {
+        console.log("Erreur chargement Supabase:", err);
+    }
+}
+
 async function sauvegarderDonneesCloud() {
     if (typeof window.supabaseClient === 'undefined') return;
     
@@ -75,45 +110,6 @@ async function sauvegarderDonneesCloud() {
         console.log("Erreur sauvegarde Supabase:", err);
     }
 }
-async function sauvegarderDonneesCloud() {
-    if (typeof supabase === 'undefined') return;
-    
-    let calendriers = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        if (key.startsWith('calendrier_')) {
-            calendriers[key] = JSON.parse(localStorage.getItem(key));
-        }
-    }
-    
-    const toutesDonnees = [
-        { cle: 'taches', valeur: taches },
-        { cle: 'releves', valeur: releves },
-        { cle: 'alertes', valeur: alertes },
-        { cle: 'maintenancesPlanifiees', valeur: maintenancesPlanifiees },
-        { cle: 'interventions', valeur: interventions },
-        { cle: 'calendriers', valeur: calendriers }
-    ];
-    
-    try {
-        for (let item of toutesDonnees) {
-            const { error } = await supabase
-                .from('donnees')
-                .upsert({ cle: item.cle, valeur: item.valeur }, { onConflict: 'cle' });
-            if (error) throw error;
-        }
-        console.log("✅ Données sauvegardées dans Supabase");
-    } catch (err) {
-        console.log("Erreur sauvegarde Supabase:", err);
-    }
-}
-
-// Modifier la fonction sauvegarder() existante
-// Ajoutez cette ligne à la fin de votre fonction sauvegarder() :
-// sauvegarderDonneesCloud();
-
-// Appeler au chargement
-chargerDonneesCloud();
 function mettreAJourStatsAccueil() {
     console.log('Mise à jour des statistiques...');
     
