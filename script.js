@@ -96,6 +96,29 @@ function chargerDatesInstallation() {
         }).catch(err => console.log("Erreur chargement dates:", err));
     }
 }
+function calculerTousIndicateurs() {
+    let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
+    let aujourdhui = new Date();
+    
+    let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
+    
+    for (let comp of composants) {
+        let dateInstall = dates[comp];
+        let mtbfSpan = document.getElementById(`mtbf_calc_${comp}`);
+        let nbPannesSpan = document.getElementById(`nb_pannes_${comp}`);
+        
+        if (dateInstall && mtbfSpan) {
+            let install = new Date(dateInstall);
+            let diffJours = Math.floor((aujourdhui - install) / (1000 * 60 * 60 * 24));
+            mtbfSpan.innerText = diffJours;
+        }
+        
+        // Pour MTTR, vous devez avoir des données de temps de réparation
+        let mttrSpan = document.getElementById(`mttr_calc_${comp}`);
+        if (mttrSpan && nbPannesSpan) {
+        }
+    }
+}
 async function chargerDonneesCloud() {
     if (typeof window.supabaseClient === 'undefined') {
         console.log("Supabase non disponible");
