@@ -1,4 +1,3 @@
-// ========== VARIABLES GLOBALES ==========
 let taches = JSON.parse(localStorage.getItem('gmao_taches') || '[]');
 let releves = JSON.parse(localStorage.getItem('gmao_releves') || '[]');
 let alertes = JSON.parse(localStorage.getItem('gmao_alertes') || '[]');
@@ -8,17 +7,13 @@ let moisActuel = new Date().getMonth();
 let anneeActuelle = new Date().getFullYear();
 let chartTemp = null;
 let chartTempTech = null;
-// ========== STOCKAGE CLOUD SUPABASE ==========
 function modifierChampCalendrier(id, champ, valeur) {
     let storageKey = 'calendrier_' + anneeActuelle + '_' + moisActuel;
     let data = JSON.parse(localStorage.getItem(storageKey) || '[]');
     let index = data.findIndex(d => d.id == id);
-    
     if (index !== -1) {
         data[index][champ] = valeur;
         localStorage.setItem(storageKey, JSON.stringify(data));
-        
-        // Sauvegarde dans Supabase
         let calendriers = {};
         for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i);
@@ -26,8 +21,6 @@ function modifierChampCalendrier(id, champ, valeur) {
                 calendriers[key] = JSON.parse(localStorage.getItem(key));
             }
         }
-        
-        // Envoyer au cloud
         if (typeof window.supabaseClient !== 'undefined') {
             window.supabaseClient.from('donnees').upsert({ 
                 cle: 'calendriers', 
@@ -38,7 +31,6 @@ function modifierChampCalendrier(id, champ, valeur) {
                 console.log("Erreur synchro calendrier:", err);
             });
         }
-        
         mettreAJourGraphique();
         verifierAlerteTemperature(data[index].temperature, data[index].date, data[index].heure);
         
@@ -46,9 +38,7 @@ function modifierChampCalendrier(id, champ, valeur) {
         if (champ === 'temperature' && data[index].temperature && data[index].temperature !== '') {
             let nomResponsable = getNomResponsable();
             let etatComp = data[index].etatCompresseur || 'Normal';
-            
             let existeDeja = releves.some(r => r.date === data[index].date + ' (' + data[index].heure + ')');
-            
             if (!existeDeja) {
                 releves.push({
                     date: data[index].date + ' (' + data[index].heure + ')',
@@ -67,33 +57,51 @@ function chargerDatesInstallation() {
         window.supabaseClient.from('donnees').select('*').eq('cle', 'dates_installation').then(res => {
             if (res.data && res.data.length > 0) {
                 let dates = res.data[0].valeur;
-                localStorage.setItem('gmao_dates_installation', JSON.stringify(dates));
-                
+                localStorage.setItem('gmao_dates_installation', JSON.stringify(dates)); 
                 let compresseur = document.getElementById('date_install_compresseur');
-                if (compresseur) compresseur.value = dates.compresseur || '';
-                
+                if (compresseur) compresseur.value = dates.compresseur || '';    
                 let evaporateur = document.getElementById('date_install_evaporateur');
-                if (evaporateur) evaporateur.value = dates.evaporateur || '';
-                
+                if (evaporateur) evaporateur.value = dates.evaporateur || '';          
                 let condenseur = document.getElementById('date_install_condenseur');
-                if (condenseur) condenseur.value = dates.condenseur || '';
-                
+                if (condenseur) condenseur.value = dates.condenseur || '';               
                 let panneaux = document.getElementById('date_install_panneaux');
                 if (panneaux) panneaux.value = dates.panneaux || '';
-                
                 let batteries = document.getElementById('date_install_batteries');
                 if (batteries) batteries.value = dates.batteries || '';
-                
                 let onduleur = document.getElementById('date_install_onduleur');
-                if (onduleur) onduleur.value = dates.onduleur || '';
-                
+                if (onduleur) onduleur.value = dates.onduleur || '';          
                 let mppt = document.getElementById('date_install_mppt');
                 if (mppt) mppt.value = dates.mppt || '';
-                
                 calculerTousIndicateurs();
                 console.log("✅ Dates d'installation chargées depuis Supabase");
             }
         }).catch(err => console.log("Erreur chargement dates:", err));
+    }
+}
+function chargerIndicateursCloud() {
+    if (typeof window.supabaseClient !== 'undefined') {
+        window.supabaseClient.from('donnees').select('*').eq('cle', 'indicateurs').then(res => {
+            if (res.data && res.data.length > 0) {
+                let indicateurs = res.data[0].valeur;
+                localStorage.setItem('gmao_indicateurs', JSON.stringify(indicateurs));
+                document.getElementById('mtbf_compresseur').value = indicateurs.mtbf_compresseur || '';
+                document.getElementById('mttr_compresseur').value = indicateurs.mttr_compresseur || '';
+                document.getElementById('mtbf_evaporateur').value = indicateurs.mtbf_evaporateur || '';
+                document.getElementById('mttr_evaporateur').value = indicateurs.mttr_evaporateur || '';
+                document.getElementById('mtbf_condenseur').value = indicateurs.mtbf_condenseur || '';
+                document.getElementById('mttr_condenseur').value = indicateurs.mttr_condenseur || '';
+                document.getElementById('mtbf_panneaux').value = indicateurs.mtbf_panneaux || '';
+                document.getElementById('mttr_panneaux').value = indicateurs.mttr_panneaux || '';
+                document.getElementById('mtbf_batteries').value = indicateurs.mtbf_batteries || '';
+                document.getElementById('mttr_batteries').value = indicateurs.mttr_batteries || '';
+                document.getElementById('mtbf_onduleur').value = indicateurs.mtbf_onduleur || '';
+                document.getElementById('mttr_onduleur').value = indicateurs.mttr_onduleur || '';
+                document.getElementById('mtbf_mppt').value = indicateurs.mtbf_mppt || '';
+                document.getElementById('mttr_mppt').value = indicateurs.mttr_mppt || '';
+                if (typeof mettreAJourStatuts === 'function') mettreAJourStatuts();
+                console.log("✅ Indicateurs chargés depuis Supabase");
+            }
+        }).catch(err => console.log("Erreur chargement indicateurs:", err));
     }
 }
 function calculerTousIndicateurs() {
@@ -106,14 +114,11 @@ function calculerTousIndicateurs() {
         let dateInstall = dates[comp];
         let mtbfSpan = document.getElementById(`mtbf_calc_${comp}`);
         let nbPannesSpan = document.getElementById(`nb_pannes_${comp}`);
-        
         if (dateInstall && mtbfSpan) {
             let install = new Date(dateInstall);
             let diffJours = Math.floor((aujourdhui - install) / (1000 * 60 * 60 * 24));
             mtbfSpan.innerText = diffJours;
         }
-        
-        // Pour MTTR, vous devez avoir des données de temps de réparation
         let mttrSpan = document.getElementById(`mttr_calc_${comp}`);
         if (mttrSpan && nbPannesSpan) {
         }
