@@ -1286,6 +1286,44 @@ function sauvegarderDatesInstallation() {
     alert("✅ Dates d'installation sauvegardées");
     calculerTousIndicateurs();
 }
+function sauvegarderIndicateurs() {
+    let indicateurs = {
+        mtbf_compresseur: document.getElementById('mtbf_compresseur')?.value || 0,
+        mttr_compresseur: document.getElementById('mttr_compresseur')?.value || 0,
+        mtbf_evaporateur: document.getElementById('mtbf_evaporateur')?.value || 0,
+        mttr_evaporateur: document.getElementById('mttr_evaporateur')?.value || 0,
+        mtbf_condenseur: document.getElementById('mtbf_condenseur')?.value || 0,
+        mttr_condenseur: document.getElementById('mttr_condenseur')?.value || 0,
+        mtbf_panneaux: document.getElementById('mtbf_panneaux')?.value || 0,
+        mttr_panneaux: document.getElementById('mttr_panneaux')?.value || 0,
+        mtbf_batteries: document.getElementById('mtbf_batteries')?.value || 0,
+        mttr_batteries: document.getElementById('mttr_batteries')?.value || 0,
+        mtbf_onduleur: document.getElementById('mtbf_onduleur')?.value || 0,
+        mttr_onduleur: document.getElementById('mttr_onduleur')?.value || 0,
+        mtbf_mppt: document.getElementById('mtbf_mppt')?.value || 0,
+        mttr_mppt: document.getElementById('mttr_mppt')?.value || 0
+    };
+    
+    localStorage.setItem('gmao_indicateurs', JSON.stringify(indicateurs));
+    
+    if (typeof window.supabaseClient !== 'undefined') {
+        window.supabaseClient.from('donnees').upsert({ 
+            cle: 'indicateurs', 
+            valeur: indicateurs 
+        }, { onConflict: 'cle' }).catch(err => console.log(err));
+    }
+    
+    let msgDiv = document.getElementById('messageIndicateurs');
+    if (msgDiv) {
+        msgDiv.innerHTML = '<div class="alert-green">✅ Indicateurs sauvegardés</div>';
+        setTimeout(() => msgDiv.innerHTML = '', 3000);
+    }
+    
+    // Mettre à jour l'affichage des statuts
+    if (typeof mettreAJourStatuts === 'function') {
+        mettreAJourStatuts();
+    }
+}
 function calculerTousIndicateurs() {
     let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
     let aujourdhui = new Date();
