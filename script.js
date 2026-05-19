@@ -639,13 +639,24 @@ function terminerPlanifiee(id) {
 }
 
 function afficherStats() {
+    // Vérifier que les variables existent
+    if (!taches) taches = [];
+    if (!releves) releves = [];
+    
     let urgentes = taches.filter(t => t.type === 'URGENT' && !t.fini).length;
     let preventives = taches.filter(t => t.type === 'PREVENTIF' && !t.fini).length;
-    document.getElementById('statUrgent').innerText = urgentes;
-    document.getElementById('statPreventif').innerText = preventives;
-    document.getElementById('statTotal').innerText = taches.length;
-    document.getElementById('statReleves').innerText = releves.length;
-    console.log("Stats mises à jour - Relevés:", releves.length);
+    
+    let statUrgent = document.getElementById('statUrgent');
+    let statPreventif = document.getElementById('statPreventif');
+    let statTotal = document.getElementById('statTotal');
+    let statReleves = document.getElementById('statReleves');
+    
+    if (statUrgent) statUrgent.innerText = urgentes;
+    if (statPreventif) statPreventif.innerText = preventives;
+    if (statTotal) statTotal.innerText = taches.length;
+    if (statReleves) statReleves.innerText = releves.length;
+    
+    console.log("Stats mises à jour - Relevés:", releves.length, "Tâches:", taches.length);
 }
 
 function afficherTaches() {
