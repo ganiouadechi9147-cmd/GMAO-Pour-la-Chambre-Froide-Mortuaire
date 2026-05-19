@@ -1284,7 +1284,9 @@ function sauvegarderDatesInstallation() {
     }
     
     alert("✅ Dates d'installation sauvegardées");
-    calculerTousIndicateurs();
+    if (typeof calculerTousIndicateurs === 'function') {
+        calculerTousIndicateurs();
+    }
 }
 function sauvegarderIndicateurs() {
     let indicateurs = {
@@ -1310,7 +1312,11 @@ function sauvegarderIndicateurs() {
         window.supabaseClient.from('donnees').upsert({ 
             cle: 'indicateurs', 
             valeur: indicateurs 
-        }, { onConflict: 'cle' }).catch(err => console.log(err));
+        }, { onConflict: 'cle' }).then(() => {
+            console.log("✅ Indicateurs sauvegardés dans Supabase");
+        }).catch(err => {
+            console.log("Erreur:", err);
+        });
     }
     
     let msgDiv = document.getElementById('messageIndicateurs');
@@ -1319,7 +1325,6 @@ function sauvegarderIndicateurs() {
         setTimeout(() => msgDiv.innerHTML = '', 3000);
     }
     
-    // Mettre à jour l'affichage des statuts
     if (typeof mettreAJourStatuts === 'function') {
         mettreAJourStatuts();
     }
