@@ -1167,5 +1167,174 @@ function modifierNomResponsable() {
         rafraichir();
     }
 }
+// ========== INDICATEURS MTTR/MTBF ==========
+function sauvegarderIndicateurs() {
+    let indicateurs = {
+        mtbf_compresseur: document.getElementById('mtbf_compresseur')?.value || 0,
+        mttr_compresseur: document.getElementById('mttr_compresseur')?.value || 0,
+        mtbf_evaporateur: document.getElementById('mtbf_evaporateur')?.value || 0,
+        mttr_evaporateur: document.getElementById('mttr_evaporateur')?.value || 0,
+        mtbf_condenseur: document.getElementById('mtbf_condenseur')?.value || 0,
+        mttr_condenseur: document.getElementById('mttr_condenseur')?.value || 0,
+        mtbf_panneaux: document.getElementById('mtbf_panneaux')?.value || 0,
+        mttr_panneaux: document.getElementById('mttr_panneaux')?.value || 0,
+        mtbf_batteries: document.getElementById('mtbf_batteries')?.value || 0,
+        mttr_batteries: document.getElementById('mttr_batteries')?.value || 0,
+        mtbf_onduleur: document.getElementById('mtbf_onduleur')?.value || 0,
+        mttr_onduleur: document.getElementById('mttr_onduleur')?.value || 0,
+        mtbf_mppt: document.getElementById('mtbf_mppt')?.value || 0,
+        mttr_mppt: document.getElementById('mttr_mppt')?.value || 0
+    };
+    
+    localStorage.setItem('gmao_indicateurs', JSON.stringify(indicateurs));
+    
+    if (typeof window.supabaseClient !== 'undefined') {
+        window.supabaseClient.from('donnees').upsert({ 
+            cle: 'indicateurs', 
+            valeur: indicateurs 
+        }, { onConflict: 'cle' }).catch(err => console.log(err));
+    }
+    
+    let msgDiv = document.getElementById('messageIndicateurs');
+    if (msgDiv) {
+        msgDiv.innerHTML = '<div class="alert-green">✅ Indicateurs sauvegardés</div>';
+        setTimeout(() => msgDiv.innerHTML = '', 3000);
+    }
+    mettreAJourStatuts();
+}
+
+function sauvegarderDatesInstallation() {
+    let dates = {
+        compresseur: document.getElementById('date_install_compresseur')?.value,
+        evaporateur: document.getElementById('date_install_evaporateur')?.value,
+        condenseur: document.getElementById('date_install_condenseur')?.value,
+        panneaux: document.getElementById('date_install_panneaux')?.value,
+        batteries: document.getElementById('date_install_batteries')?.value,
+        onduleur: document.getElementById('date_install_onduleur')?.value,
+        mppt: document.getElementById('date_install_mppt')?.value
+    };
+    
+    localStorage.setItem('gmao_dates_installation', JSON.stringify(dates));
+    
+    if (typeof window.supabaseClient !== 'undefined') {
+        window.supabaseClient.from('donnees').upsert({ 
+            cle: 'dates_installation', 
+            valeur: dates 
+        }, { onConflict: 'cle' }).catch(err => console.log(err));
+    }
+    
+    alert("✅ Dates d'installation sauvegardées");
+    calculerTousIndicateurs();
+}
+
+function calculerTousIndicateurs() {
+    let dates = JSON.parse(localStorage.getItem('gmao_dates_installation') || '{}');
+    let aujourdhui = new Date();
+    
+    let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
+    
+    for (let comp of composants) {
+        let dateInstall = dates[comp];
+        if (dateInstall) {
+            let install = new Date(dateInstall);
+            let diffJours = Math.floor((aujourdhui - install) / (1000 * 60 * 60 * 24));
+            let mtbfSpan = document.getElementById(`mtbf_calc_${comp}`);
+            if (mtbfSpan) mtbfSpan.innerText = diffJours;
+        }
+    }
+}
+
+function mettreAJourStatuts() {
+    let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
+    
+    let composants = ['compresseur', 'evaporateur', 'condenseur', 'panneaux', 'batteries', 'onduleur', 'mppt'];
+    
+    for (let comp of composants) {
+        let mtbf = indicateurs[`mtbf_${comp}`] || 0;
+        let statutDiv = document.getElementById(`statut_${comp}`);
+        
+        if (statutDiv) {
+            if (mtbf > 200) {
+                statutDiv.innerHTML = '✅ Excellent';
+                statutDiv.className = 'indicateur-statut statut-excellent';
+            } else if (mtbf >= 100) {
+                statutDiv.innerHTML = '🟠 Correct - Surveiller';
+                statutDiv.className = 'indicateur-statut statut-correct';
+            } else if (mtbf > 0) {
+                statutDiv.innerHTML = '🔴 Critique - Intervention nécessaire';
+                statutDiv.className = 'indicateur-statut statut-critique';
+            } else {
+                statutDiv.innerHTML = '⚪ Non renseigné';
+                statutDiv.className = 'indicateur-statut';
+            }
+        }
+    }
+}
+
+function chargerIndicateurs() {
+    let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
+    
+    document.getElementById('mtbf_compresseur').value = indicateurs.mtbf_compresseur || '';
+    document.getElementById('mttr_compresseur').value = indicateurs.mttr_compresseur || '';
+    document.getElementById('mtbf_evaporateur').value = indicateurs.mtbf_evaporateur || '';
+    document.getElementById('mttr_evaporateur').value = indicateurs.mttr_evaporateur || '';
+    document.getElementById('mtbf_condenseur').value = indicateurs.mtbf_condenseur || '';
+    document.getElementById('mttr_condenseur').value = indicateurs.mttr_condenseur || '';
+    document.getElementById('mtbf_panneaux').value = indicateurs.mtbf_panneaux || '';
+    document.getElementById('mttr_panneaux').value = indicateurs.mttr_panneaux || '';
+    document.getElementById('mtbf_batteries').value = indicateurs.mtbf_batteries || '';
+    document.getElementById('mttr_batteries').value = indicateurs.mttr_batteries || '';
+    document.getElementById('mtbf_onduleur').value = indicateurs.mtbf_onduleur || '';
+    document.getElementById('mttr_onduleur').value = indicateurs.mttr_onduleur || '';
+    document.getElementById('mtbf_mppt').value = indicateurs.mtbf_mppt || '';
+    document.getElementById('mttr_mppt').value = indicateurs.mttr_mppt || '';
+    
+    mettreAJourStatuts();
+}
+
+function afficherIndicateursTechnicien() {
+    let indicateurs = JSON.parse(localStorage.getItem('gmao_indicateurs') || '{}');
+    let container = document.getElementById('indicateursTech');
+    if (!container) return;
+    
+    let composants = [
+        { id: 'compresseur', nom: '🔧 Compresseur', mtbf: indicateurs.mtbf_compresseur, mttr: indicateurs.mttr_compresseur },
+        { id: 'evaporateur', nom: '❄️ Évaporateur', mtbf: indicateurs.mtbf_evaporateur, mttr: indicateurs.mttr_evaporateur },
+        { id: 'condenseur', nom: '🌡️ Condenseur', mtbf: indicateurs.mtbf_condenseur, mttr: indicateurs.mttr_condenseur },
+        { id: 'panneaux', nom: '☀️ Panneaux solaires', mtbf: indicateurs.mtbf_panneaux, mttr: indicateurs.mttr_panneaux },
+        { id: 'batteries', nom: '🔋 Batteries', mtbf: indicateurs.mtbf_batteries, mttr: indicateurs.mttr_batteries },
+        { id: 'onduleur', nom: '⚡ Onduleur hybride', mtbf: indicateurs.mtbf_onduleur, mttr: indicateurs.mttr_onduleur },
+        { id: 'mppt', nom: '⚡ Contrôleur MPPT', mtbf: indicateurs.mtbf_mppt, mttr: indicateurs.mttr_mppt }
+    ];
+    
+    let html = '';
+    for (let comp of composants) {
+        let statut = '';
+        let statutClass = '';
+        if (comp.mtbf > 200) {
+            statut = '✅ Excellent';
+            statutClass = 'statut-excellent';
+        } else if (comp.mtbf >= 100) {
+            statut = '🟠 Correct';
+            statutClass = 'statut-correct';
+        } else if (comp.mtbf > 0) {
+            statut = '🔴 Critique';
+            statutClass = 'statut-critique';
+        } else {
+            statut = '⚪ Non renseigné';
+        }
+        
+        html += `
+            <div class="indicateur-card">
+                <h3>${comp.nom}</h3>
+                <div><strong>MTBF :</strong> ${comp.mtbf || '--'} jours</div>
+                <div><strong>MTTR :</strong> ${comp.mttr || '--'} heures</div>
+                <div class="indicateur-statut ${statutClass}">${statut}</div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
 chargerDonneesCloud();
 verifierConnexionExistante();
