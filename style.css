@@ -4,15 +4,37 @@
     box-sizing: border-box;
 }
 
-/* ========== FOND D'ÉCRAN ========== */
+/* ========== FOND D'ÉCRAN AVEC VOILE SOMBRE ========== */
 body {
+    position: relative;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('https://images.unsplash.com/photo-1516549655169-df83a0774514?w=1600');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    min-height: 100vh;
+    z-index: -2;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
 }
 
 /* ========== EN-TÊTES ========== */
@@ -180,7 +202,7 @@ body {
     padding-bottom: 10px;
 }
 
-/* ========== PAGE D'ACCUEIL - ÉLÉMENTS TRANSPARENTS (SANS FOND BLANC) ========== */
+/* ========== PAGE D'ACCUEIL - ÉLÉMENTS TRANSPARENTS ========== */
 #pageAccueil .card,
 #pageAccueil .stat-rapide,
 #pageAccueil .card-connexion,
@@ -195,7 +217,8 @@ body {
 #pageAccueil .stat-rapide,
 #pageAccueil .contact-item,
 #pageAccueil .lien {
-    color: #333;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 #pageAccueil .galerie-placeholder {
@@ -205,6 +228,8 @@ body {
 #pageAccueil .bandeau-info {
     background: rgba(255, 243, 205, 0.7);
     border: 1px solid #ffeeba;
+    color: #856404;
+    text-shadow: none;
 }
 
 #pageAccueil .card iframe {
@@ -457,7 +482,7 @@ textarea {
 
 .galerie-placeholder {
     font-size: 40px;
-    background: #f0f4f8;
+    background: rgba(240, 244, 248, 0.8);
     width: 80px;
     height: 80px;
     border-radius: 15px;
@@ -469,7 +494,7 @@ textarea {
 
 /* ========== BANDEAU INFO ========== */
 .bandeau-info {
-    background: #fff3cd;
+    background: rgba(255, 243, 205, 0.9);
     color: #856404;
     padding: 10px;
     border-radius: 8px;
@@ -490,7 +515,13 @@ textarea {
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(238, 238, 238, 0.5);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.contact-item span, .contact-item strong {
+    color: white;
 }
 
 .liens {
@@ -501,8 +532,9 @@ textarea {
 }
 
 .lien {
-    color: #1a5f7a;
+    color: white;
     text-decoration: none;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .lien:hover {
@@ -525,14 +557,17 @@ textarea {
 .info-connexion {
     text-align: center;
     font-size: 12px;
-    color: #666;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .card-connexion {
-    background: white;
+    background: transparent;
     border-radius: 15px;
     padding: 25px;
     text-align: center;
+    box-shadow: none;
+    border: none;
 }
 
 /* ========== CHATBOT ========== */
