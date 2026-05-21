@@ -38,7 +38,7 @@ body::after {
 }
 
 /* ========== EN-TÊTES ========== */
-.header-vert {
+.header-jaune {
     background: linear-gradient(135deg, #2e7d32, #1b5e20);
     color: white;
     padding: 25px;
