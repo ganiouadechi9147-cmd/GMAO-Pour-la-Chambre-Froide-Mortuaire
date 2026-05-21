@@ -14,7 +14,7 @@ body {
 /* Page d'accueil - Jaune */
 .header-vert {
     background: linear-gradient(135deg, #f9a825, #f57f17);
-    color: white;
+    color: beige;
     padding: 25px;
     text-align: center;
 }
