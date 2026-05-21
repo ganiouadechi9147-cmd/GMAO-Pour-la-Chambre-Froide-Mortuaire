@@ -4,42 +4,16 @@
     box-sizing: border-box;
 }
 
-/* ========== FOND D'ÉCRAN AVEC VOILE SOMBRE ========== */
 body {
-    position: relative;
+    background: #f0f2f5;
     font-family: 'Segoe UI', Arial, sans-serif;
     min-height: 100vh;
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('https://images.pexels.com/photos/4389728/pexels-photo-4389728.jpeg?w=1600');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    z-index: -2;
-}
-
-body::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: -1;
-}
-
 /* ========== EN-TÊTES ========== */
+/* Page d'accueil - Jaune */
 .header-vert {
-    background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    background: linear-gradient(135deg, #f9a825, #f57f17);
     color: white;
     padding: 25px;
     text-align: center;
@@ -63,23 +37,26 @@ body::after {
     justify-content: center;
 }
 
+/* Espace responsable - Bleu ciel */
 .header-marron {
-    background: linear-gradient(135deg, #795548, #4e342e);
+    background: linear-gradient(135deg, #4fc3f7, #0288d1);
     color: white;
     padding: 20px;
     text-align: center;
 }
 
+/* Espace technicien - Orange */
 .header-violet {
-    background: linear-gradient(135deg, #7b1fa2, #4a148c);
+    background: linear-gradient(135deg, #ff9800, #e65100);
     color: white;
     padding: 20px;
     text-align: center;
 }
 
 /* ========== BOUTONS ========== */
+/* Page d'accueil - Jaune */
 .btn-vert {
-    background: #2e7d32;
+    background: #f9a825;
     color: white;
     border: none;
     padding: 14px;
@@ -91,11 +68,12 @@ body::after {
 }
 
 .btn-vert:hover {
-    background: #1b5e20;
+    background: #f57f17;
 }
 
+/* Espace responsable - Bleu ciel */
 .btn-marron {
-    background: #795548;
+    background: #0288d1;
     color: white;
     border: none;
     padding: 14px;
@@ -107,11 +85,12 @@ body::after {
 }
 
 .btn-marron:hover {
-    background: #4e342e;
+    background: #01579b;
 }
 
+/* Espace technicien - Orange */
 .btn-violet {
-    background: #7b1fa2;
+    background: #ff9800;
     color: white;
     border: none;
     padding: 14px;
@@ -123,7 +102,7 @@ body::after {
 }
 
 .btn-violet:hover {
-    background: #4a148c;
+    background: #e65100;
 }
 
 .btn-small {
@@ -186,7 +165,7 @@ body::after {
     margin-top: 0;
 }
 
-/* ========== CARTES (espace responsable et technicien) ========== */
+/* ========== CARTES ========== */
 .card {
     background: white;
     border-radius: 15px;
@@ -200,40 +179,6 @@ body::after {
     margin-bottom: 20px;
     border-bottom: 2px solid #e9ecef;
     padding-bottom: 10px;
-}
-
-/* ========== PAGE D'ACCUEIL - ÉLÉMENTS TRANSPARENTS ========== */
-#pageAccueil .card,
-#pageAccueil .stat-rapide,
-#pageAccueil .card-connexion,
-#pageAccueil .bandeau-info {
-    background: transparent;
-    box-shadow: none;
-    border: none;
-}
-
-#pageAccueil .card h2,
-#pageAccueil .card p,
-#pageAccueil .stat-rapide,
-#pageAccueil .contact-item,
-#pageAccueil .lien {
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-#pageAccueil .galerie-placeholder {
-    background: rgba(240, 244, 248, 0.8);
-}
-
-#pageAccueil .bandeau-info {
-    background: rgba(255, 243, 205, 0.7);
-    border: 1px solid #ffeeba;
-    color: #856404;
-    text-shadow: none;
-}
-
-#pageAccueil .card iframe {
-    border-radius: 15px;
 }
 
 /* ========== STATISTIQUES ========== */
@@ -255,7 +200,7 @@ body::after {
 .stat-number {
     font-size: 32px;
     font-weight: bold;
-    color: #4e342e;
+    color: #0288d1;
 }
 
 .stats-rapides {
@@ -376,7 +321,7 @@ body::after {
 }
 
 .calendrier th {
-    background: #795548;
+    background: #0288d1;
     color: white;
     font-weight: bold;
 }
@@ -482,7 +427,7 @@ textarea {
 
 .galerie-placeholder {
     font-size: 40px;
-    background: rgba(240, 244, 248, 0.8);
+    background: #f0f4f8;
     width: 80px;
     height: 80px;
     border-radius: 15px;
@@ -494,7 +439,7 @@ textarea {
 
 /* ========== BANDEAU INFO ========== */
 .bandeau-info {
-    background: rgba(255, 243, 205, 0.9);
+    background: #fff3cd;
     color: #856404;
     padding: 10px;
     border-radius: 8px;
@@ -515,13 +460,7 @@ textarea {
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid rgba(238, 238, 238, 0.5);
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.contact-item span, .contact-item strong {
-    color: white;
+    border-bottom: 1px solid #eee;
 }
 
 .liens {
@@ -532,9 +471,8 @@ textarea {
 }
 
 .lien {
-    color: white;
+    color: #1a5f7a;
     text-decoration: none;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .lien:hover {
@@ -557,17 +495,14 @@ textarea {
 .info-connexion {
     text-align: center;
     font-size: 12px;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    color: #666;
 }
 
 .card-connexion {
-    background: transparent;
+    background: white;
     border-radius: 15px;
     padding: 25px;
     text-align: center;
-    box-shadow: none;
-    border: none;
 }
 
 /* ========== CHATBOT ========== */
@@ -583,7 +518,7 @@ textarea {
 }
 
 .chatbot-header {
-    background: #7b1fa2;
+    background: #ff9800;
     color: white;
     padding: 15px;
     border-radius: 15px 15px 0 0;
@@ -613,7 +548,7 @@ textarea {
 }
 
 .user-message {
-    background: #7b1fa2;
+    background: #ff9800;
     color: white;
     padding: 10px;
     border-radius: 10px;
