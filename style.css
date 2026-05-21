@@ -6,7 +6,7 @@
 
 body {
     background: #f0f2f5;
-    font-family: 'Segoe UI', Times-New-Roman, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     min-height: 100vh;
 }
 
@@ -45,9 +45,9 @@ body {
     text-align: center;
 }
 
-/* Espace technicien - Orange */
+/* Espace technicien - Vert */
 .header-violet {
-    background: linear-gradient(135deg, #ff9800, #e65100);
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
     color: white;
     padding: 20px;
     text-align: center;
@@ -88,9 +88,9 @@ body {
     background: #01579b;
 }
 
-/* Espace technicien - Orange */
+/* Espace technicien - Vert */
 .btn-violet {
-    background: #ff9800;
+    background: #4caf50;
     color: white;
     border: none;
     padding: 14px;
@@ -102,7 +102,7 @@ body {
 }
 
 .btn-violet:hover {
-    background: #e65100;
+    background: #2e7d32;
 }
 
 .btn-small {
@@ -518,7 +518,7 @@ textarea {
 }
 
 .chatbot-header {
-    background: #ff9800;
+    background: #4caf50;
     color: white;
     padding: 15px;
     border-radius: 15px 15px 0 0;
@@ -548,7 +548,7 @@ textarea {
 }
 
 .user-message {
-    background: #ff9800;
+    background: #4caf50;
     color: white;
     padding: 10px;
     border-radius: 10px;
